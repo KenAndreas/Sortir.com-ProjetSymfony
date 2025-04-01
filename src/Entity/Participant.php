@@ -40,7 +40,7 @@ class Participant
     private ?string $pseudo = null;
 
     #[ORM\ManyToOne(inversedBy: 'participants')]
-    private ?campus $campus = null;
+    private ?Campus $campus = null;
 
     /**
      * @var Collection<int, Sortie>

@@ -3,31 +3,35 @@
 {% block title %}Hello SortieController!{% endblock %}
 
 {% block body %}
-    <style>
-        .example-wrapper {
-            margin: 1em auto;
-            max-width: 800px;
-            width: 95%;
-            font: 18px/1.5 sans-serif;
-        }
-
-        .example-wrapper code {
-            background: #F5F5F5;
-            padding: 2px 6px;
-        }
-    </style>
-
-    <div class="example-wrapper">
+    <div class="container-xl">
         <h1>Hello {{ controller_name }}! ✅</h1>
 
-        This friendly message is coming from:
-        <ul>
-            {% for c in campus %}
-                <li>{{ c.nom|e }}</li>
-            {% endfor %}
-        </ul>
 
-        <table class="table">
+        Filtrer les sorties
+
+        <div>
+            <div>
+                Campus :
+                <select class="form-select form-select-sm" aria-label="Campus" style="display: initial; width: fit-content">
+                    {% for c in campus %}
+                        <option value="{{ c.id }}">{{ c.nom|e }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                Le nom de la sortie contient
+                <input class="form-control form-control-sm" type="text" placeholder="search" aria-label="search" style="display: initial; width: fit-content">
+            </div>
+            <div>
+                Entre
+                <input class="form-control form-control-sm" type="date" placeholder="search" aria-label="search" style="display: initial; width: fit-content">
+                et
+                <input class="form-control form-control-sm" type="date" placeholder="search" aria-label="search" style="display: initial; width: fit-content">
+            </div>
+        </div>
+
+
+        <table class="table table-bordered table-hover">
             <thead>
             <tr>
                 <th scope="col">Nom de la sortie</th>
@@ -40,17 +44,40 @@
                 <th scope="col">Action</th>
             </tr>
             </thead>
-            <tr>
-                <td>Mark</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-            </tr>
+            <tbody class="table-group-divider">
+            {% for sortie in sorties %}
+                {% if sortie.etat.libelle != 'En création' or (sortie.organisateur.pseudo == 'UTILISATEUR_CONNECTE.PSEUDO' and sortie.etat.libelle == 'En création') %}
+                <tr>
+                    <td>{{ sortie.nom|capitalize }}</td>
+                    <td>{{ sortie.dateHeureDebut|format_datetime(pattern: "dd/MM/yyyy à hh:mm") }}</td>
+                    <td>{{ sortie.dateLimiteInscription|format_datetime(pattern: "dd/MM/yyyy") }}</td>
+                    <td>{{ sortie.participants|length }} / {{ sortie.NbInscriptionMax }}</td>
+                    <td>{{ sortie.etat.libelle }}</td>
+                    <td>{% if sortie.participants|find(p => p.id == 0) != null %}
+                            X
+                        {% endif %}</td>
+                    <td>{{ sortie.organisateur.pseudo }}</td>
+                    <td>
+                        {% if sortie.dateHeureDebut|date <= today|date %}
+                            <button type="button" class="btn btn-primary">Afficher</button>
+                        {% endif %}
+                        {% if sortie.organisateur.pseudo == 'UTILISATEUR_CONNECTE.PSEUDO' and sortie.etat.libelle == 'En création'%}
+                            <button type="button" class="btn btn-primary">Modifier</button>
+                            <button type="button" class="btn btn-primary">Publier</button>
+                            <button type="button" class="btn btn-danger">Supprimer</button>
+                        {% else %}
+                            {% if sortie.participants|find(p => p.id == 0) != null %}
+                                <button type="button" class="btn btn-primary">Se désister</button>
+                            {% else %}
+                                <button type="button" class="btn btn-primary">S'inscrire</button>
+                            {% endif %}
+                        {% endif %}
 
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
         </table>
     </div>
 {% endblock %}
