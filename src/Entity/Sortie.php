@@ -38,14 +38,14 @@ class Sortie
     private ?object $etat = null;
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
-    private ?campus $campus = null;
+    private ?Campus $campus = null;
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
-    private ?lieu $lieu = null;
+    private ?Lieu $lieu = null;
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?participant $organisateur = null;
+    private ?Participant $organisateur = null;
 
     /**
      * @var Collection<int, participant>

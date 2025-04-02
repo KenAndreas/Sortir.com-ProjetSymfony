@@ -34,7 +34,7 @@ class Lieu
     private Collection $sorties;
 
     #[ORM\ManyToOne(inversedBy: 'lieux')]
-    private ?ville $ville = null;
+    private ?Ville $ville = null;
 
     public function __construct()
     {
