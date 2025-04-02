@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello CampusController!{% endblock %}
+
+{% block body %}
+    <h1>Créer une sortie</h1>
+
+    <form>
+        <div class="container row">
+            <div class="col">
+                <div>
+                    <label class="form-label" for="nom">
+                        Nom :
+                    </label>
+                    <input class="form-control" type="text" id="nom" name="nom"
+                           style="display: initial; width: fit-content">
+                </div>
+                <div>
+                    <label class="form-check-label" for="dateHeureDebut">
+                        Date de début
+                    </label>
+                    <input class="form-control form-control-sm" aria-label="dateHeureDebut" type="date"
+                           name="dateHeureDebut"
+                           style="display: initial; width: fit-content">
+                </div>
+                <div>
+                    <label class="form-label" for="dateLimiteInscription">
+                        Date limite d'inscription
+                    </label>
+                    <input class="form-control form-control-sm" aria-label="dateLimiteInscription" type="date"
+                           name="dateLimiteInscription"
+                           style="display: initial; width: fit-content">
+                </div>
+                <div>
+                    <label class="form-label" for="nbInscriptionMax">
+                        Nombre de places
+                    </label>
+                    <input class="form-control form-control-sm" aria-label="nbInscriptionMax" type="number" id="nbInscriptionMax"
+                           name="nbInscriptionMax" style="display: initial; width: fit-content">
+                </div>
+                <div>
+                    <label class="form-label" for="nbInscriptionMax">
+                        Durée (en minute)
+                    </label>
+                    <input class="form-control form-control-sm" aria-label="nbInscriptionMax" type="number" id="nbInscriptionMax"
+                           name="nbInscriptionMax" style="display: initial; width: fit-content">
+                </div>
+            </div>
+            <div class="col">
+                <div>
+                    <label class="form-label" for="campus">
+                        Campus :
+                    </label>
+                    <select class="form-select form-select-sm" aria-label="Campus" name="campus" id="campus"
+                            style="display: initial; width: fit-content">
+                        <option value="" selected>Choisir</option>
+                        {% for c in campus %}
+                            <option value="{{ c.id }}">{{ c.nom|e }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="campus">
+                        Ville :
+                    </label>
+                    <select class="form-select form-select-sm" aria-label="Campus" name="campus" id="campus"
+                            style="display: initial; width: fit-content">
+                        <option value="" selected>Choisir</option>
+                        {% for v in villes %}
+                            <option value="{{ v.id }}">{{ v.nom|e }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="campus">
+                        Lieu :
+                    </label>
+                    <select class="form-select form-select-sm" aria-label="Campus" name="campus" id="campus"
+                            style="display: initial; width: fit-content">
+                        <option value="" selected></option>
+                        {% for l in lieux %}
+                            <option value="{{ l.id }}">{{ l.nom|e }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="nbInscriptionMax">
+                        Rue
+                    </label>
+                    <input class="form-control form-control-sm" aria-label="rue" type="text" id="rue"
+                           name="rue" style="display: initial; width: fit-content">
+                </div>
+                <div>
+                    <label class="form-label" for="codePostal">
+                        Code postal
+                    </label>
+                    <input class="form-control form-control-sm" aria-label="codePostal" type="number" id="codePostal"
+                           name="codePostal" style="display: initial; width: fit-content">
+                </div>
+                <div>
+                    <label class="form-label" for="latitude">
+                        Latitude
+                    </label>
+                    <input class="form-control form-control-sm" aria-label="latitude" type="text" id="latitude"
+                           name="latitude" style="display: initial; width: fit-content">
+                </div>
+                <div>
+                    <label class="form-label" for="longitude">
+                        Longitude
+                    </label>
+                    <input class="form-control form-control-sm" aria-label="longitude" type="text" id="longitude"
+                           name="longitude" style="display: initial; width: fit-content">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col col-lg-2 form-label" for="longitude">
+                Description et infos :
+            </label>
+            <textarea class="col form-control" aria-label="description" id="description"
+                      name="description"></textarea>
+        </div>
+    </form>
+{% endblock %}

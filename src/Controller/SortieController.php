@@ -3,7 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Campus;
+use App\Entity\Etat;
+use App\Entity\Lieu;
+use App\Entity\Participant;
 use App\Entity\Sortie;
+use App\Entity\Ville;
+use App\Repository\SortieRepository;
 use App\Service\SortieService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,7 +21,6 @@ final class SortieController extends AbstractController
     #[Route('/', name: 'app_sortie', methods: ['GET'])]
     public function index(EntityManagerInterface $em): Response
     {
-
         return $this->render('sortie/index.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
             'sorties' => $em->getRepository(Sortie::class)->findAll(),
@@ -28,26 +32,35 @@ final class SortieController extends AbstractController
     public function getFiltre(Request $request, EntityManagerInterface $em): Response
     {
         $params = [];
-        if ($request->request->has('campus')) {
+
+        //Filtre par campus
+        if ($request->request->get('campus') != "") {
             $params['campus'] = $request->request->get('campus');
         }
+
         $service = new SortieService();
         $sorties = $em->getRepository(Sortie::class)->findBy($params);
+
+        //Filtre par dates
         $sorties = $service->filterByDates($sorties,
             $request->request->get('dateDebut'),
             $request->request->get('dateFin'));
+
+        //TODO ajouter USER
+        $falseUser = $em->getRepository(Participant::class)->findOneBy(['pseudo' => 'Gégé']);
+
         if ($request->request->has('checkOrga')) {
-            //TODO ajouter USER
-            //$service->filterByOrga($sorties, )
+            $sorties = $service->filterByOrga($sorties, $falseUser);
         }
         if ($request->request->has('checkInscrit')) {
-            $params['checkInscrit'] = $request->request->get('checkInscrit');
+            $sorties = $service->filterByInscrit($sorties, $falseUser);
         }
         if ($request->request->has('checkNoInscrit')) {
-            $params['checkNoInscrit'] = $request->request->get('checkNoInscrit');
+            $sorties = $service->filterByNonInscrit($sorties, $falseUser);
         }
         if ($request->request->has('checkClose')) {
-            $params['checkClose'] = $request->request->get('checkClose');
+            $etat = $em->getRepository(Etat::class)->findOneBy(['libelle' => 'Terminée']);
+            $sorties = $service->filterByEtatClose($sorties, $etat);
         }
 
         return $this->render('sortie/index.html.twig', [
@@ -56,5 +69,33 @@ final class SortieController extends AbstractController
             'today' => new \DateTime(),
             'filterForm' => $request,
         ]);
+    }
+
+    #[Route('/sortie/create', name: 'create_sortie', methods: ['GET', 'POST'])]
+    public function createSortie(Request $request,EntityManagerInterface $em): Response
+    {
+        //vérifier utilisateur
+        //vérifier sortie
+        //si ok pousser
+        return $this->render('sortie/sortieForm.html.twig', [
+            'campus' => $em->getRepository(Campus::class)->findAll(),
+            'villes' => $em->getRepository(Ville::class)->findAll(),
+            'lieux' => $em->getRepository(Lieu::class)->findAll(),
+            'sorties' => $em->getRepository(Sortie::class)->findAll(),
+            'today' => new \DateTime(),
+        ]);
+    }
+
+    #[Route('/sortie', name: 'show_sortie', requirements: ['id' =>'\d+'], methods: ['GET'])]
+    public function getSortie(int $id,SortieRepository $sortieRepository): Response
+    {
+        $sortie = $sortieRepository->find($id);
+        if($sortie) {
+            return $this->render('sortie/showSortie.html.twig', [
+                'sortie' => $sortie
+            ]);
+        }else{
+            return $this->redirectToRoute('app_error');
+        }
     }
 }

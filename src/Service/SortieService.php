@@ -1,6 +1,7 @@
 <?php
 namespace App\Service;
 
+use App\Entity\Etat;
 use App\Entity\Participant;
 use function Sodium\add;
 
@@ -31,12 +32,51 @@ final class SortieService{
         return $filteredSorties;
     }
 
-    public function filterByOrga($sorties, Participant $user): array
+    public function filterByOrga($sorties, $user): array
     {
         $filteredSorties = [];
         $index = 0;
         foreach ($sorties as $sortie) {
             if( $sortie->getOrganisateur()->getPseudo() == $user->getPseudo() ){
+                $filteredSorties[$index] = $sortie;
+            }
+            $index+=1;
+        }
+        return $filteredSorties;
+    }
+
+    public function filterByInscrit($sorties, $user): array
+    {
+        $filteredSorties = [];
+        $index = 0;
+        foreach ($sorties as $sortie) {
+            if( array_find($sortie->getParticipants(), $user)){
+                $filteredSorties[$index] = $sortie;
+            }
+            $index+=1;
+        }
+        return $filteredSorties;
+    }
+
+    public function filterByNonInscrit($sorties, $user): array
+    {
+        $filteredSorties = [];
+        $index = 0;
+        foreach ($sorties as $sortie) {
+            if( !array_find($sortie->getParticipants(), $user)){
+                $filteredSorties[$index] = $sortie;
+            }
+            $index+=1;
+        }
+        return $filteredSorties;
+    }
+
+    public function filterByEtatClose($sorties, Etat $etat): array
+    {
+        $filteredSorties = [];
+        $index = 0;
+        foreach ($sorties as $sortie) {
+            if( $sortie->getEtat()->getLibelle() == $etat->getLibelle()){
                 $filteredSorties[$index] = $sortie;
             }
             $index+=1;

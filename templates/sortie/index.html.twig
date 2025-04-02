@@ -3,7 +3,6 @@
 {% block title %}Hello SortieController!{% endblock %}
 
 {% block body %}
-    <div class="container-xl">
         <h1>Accueil</h1>
         <h2>Filtrer les sorties</h2>
 
@@ -14,6 +13,7 @@
                         Campus :
                         <select class="form-select form-select-sm" aria-label="Campus" name="campus"
                                 style="display: initial; width: fit-content">
+                                <option value="" selected>Choisir</option>
                             {% for c in campus %}
                                 <option value="{{ c.id }}">{{ c.nom|e }}</option>
                             {% endfor %}
@@ -65,7 +65,7 @@
             </div>
         </form>
         <h2>Nos Sorties</h2>
-        <button type="button" class="btn btn-primary">Créer une sortie</button>
+        <a href="{{ path('create_sortie') }}"><button type="button" class="btn btn-primary">Créer une sortie</button></a>
         <table class="table table-bordered table-hover">
             <thead>
             <tr>
@@ -94,7 +94,7 @@
                         <td>{{ sortie.organisateur.pseudo }}</td>
                         <td>
                             {% if sortie.dateHeureDebut|date <= today|date %}
-                                <button type="button" class="btn btn-primary">Afficher</button>
+                                <a href="{{ path('create_sortie') }}"><button type="button" class="btn btn-primary">Afficher</button></a>
                             {% endif %}
                             {% if sortie.etat.libelle == 'En création' %}
                                 <button type="button" class="btn btn-primary">Modifier</button>
@@ -114,5 +114,4 @@
             </tbody>
         </table>
         <button type="button" class="btn btn-primary">Créer une sortie</button>
-    </div>
 {% endblock %}
