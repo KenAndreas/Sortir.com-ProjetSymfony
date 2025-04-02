@@ -6,9 +6,11 @@ use App\Repository\ParticipantRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: ParticipantRepository::class)]
-class Participant
+class Participant implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -45,6 +47,8 @@ class Participant
     /**
      * @var Collection<int, Sortie>
      */
+
+
     #[ORM\OneToMany(targetEntity: Sortie::class, mappedBy: 'participant', orphanRemoval: true)]
     private Collection $sorties;
 
@@ -201,5 +205,26 @@ class Participant
         }
 
         return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+          return $this->motDePasse;
+    }
+
+    public function getRoles(): array
+    {
+        return["ROLE_USER"];
+        // TODO: Implement getRoles() method.
+    }
+
+    public function eraseCredentials()
+    {
+        // TODO: Implement eraseCredentials() method.
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->pseudo;
     }
 }
