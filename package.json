@@ -1,0 +1,17 @@
+{
+  "name": "sortir.com-projetsymfony",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KenAndreas/Sortir.com-ProjetSymfony.git"
+  },
+  "private": true,
+  "dependencies": {
+    "@symfony/stimulus-bundle": "^2.23.0"
+  }
+}

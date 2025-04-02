@@ -6,13 +6,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class ParticipantController extends AbstractController
+final class CampusController extends AbstractController
 {
-    #[Route('/participant', name: 'app_participant')]
+    #[Route('/campus', name: 'app_campus')]
     public function index(): Response
     {
-        return $this->render('participant/index.html.twig', [
-            'controller_name' => 'ParticipantController',
+        return $this->render('campus/index.html.twig', [
+            'controller_name' => 'CampusController',
         ]);
     }
 }
