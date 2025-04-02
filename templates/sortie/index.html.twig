@@ -6,56 +6,64 @@
     <div class="container-xl">
         <h1>Accueil</h1>
         <h2>Filtrer les sorties</h2>
-        <div class="container row">
-            <div class="col">
-                <div>
-                    Campus :
-                    <select class="form-select form-select-sm" aria-label="Campus" style="display: initial; width: fit-content">
-                        {% for c in campus %}
-                            <option value="{{ c.id }}">{{ c.nom|e }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div>
-                    Le nom de la sortie contient
-                    <input class="form-control form-control-sm" type="text" placeholder="search" aria-label="search" style="display: initial; width: fit-content">
-                </div>
-                <div>
-                    Entre
-                    <input class="form-control form-control-sm" type="date" placeholder="search" aria-label="search" style="display: initial; width: fit-content">
-                    et
-                    <input class="form-control form-control-sm" type="date" placeholder="search" aria-label="search" style="display: initial; width: fit-content">
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="checkOrga">
-                    <label class="form-check-label" for="checkOrga">
-                        Sorties dont je suis l'organisateur/trice
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="checkInscrit">
-                    <label class="form-check-label" for="checkInscrit">
-                        Sorties auxquelles je suis inscrit(e)
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="checkNoInscrit">
-                    <label class="form-check-label" for="checkNoInscrit">
-                        Sorties auxquelles je ne suis pas inscrit(e)
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="checkClose">
-                    <label class="form-check-label" for="checkClose">
-                        Sorties terminées
-                    </label>
-                </div>
-            </div>
-            <div class="col text-center"><button type="button" class="btn btn-primary">Rechercher</button></div>
 
-        </div>
+        <form action="{{ path('app_sorties_filter') }}" method="post">
+            <div class="container row">
+                <div class="col">
+                    <div>
+                        Campus :
+                        <select class="form-select form-select-sm" aria-label="Campus" name="campus"
+                                style="display: initial; width: fit-content">
+                            {% for c in campus %}
+                                <option value="{{ c.id }}">{{ c.nom|e }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        Le nom de la sortie contient
+                        <input class="form-control form-control-sm" type="text" placeholder="search" name="search"
+                               aria-label="search" style="display: initial; width: fit-content">
+                    </div>
+                    <div>
+                        Entre
+                        <input class="form-control form-control-sm" aria-label="dateDebut" type="date" name="dateDebut"
+                               style="display: initial; width: fit-content">
+                        et
+                        <input class="form-control form-control-sm" aria-label="dateFin" type="date" name="dateFin"
+                               style="display: initial; width: fit-content">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="checkOrga" name="checkOrga">
+                        <label class="form-check-label" for="checkOrga">
+                            Sorties dont je suis l'organisateur/trice
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="checkInscrit" name="checkInscrit">
+                        <label class="form-check-label" for="checkInscrit">
+                            Sorties auxquelles je suis inscrit(e)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="checkNoInscrit" name="checkNoInscrit">
+                        <label class="form-check-label" for="checkNoInscrit">
+                            Sorties auxquelles je ne suis pas inscrit(e)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="checkClose" name="checkClose">
+                        <label class="form-check-label" for="checkClose">
+                            Sorties terminées
+                        </label>
+                    </div>
+                </div>
+                <div class="col text-center">
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </div>
+            </div>
+        </form>
         <h2>Nos Sorties</h2>
         <button type="button" class="btn btn-primary">Créer une sortie</button>
         <table class="table table-bordered table-hover">
@@ -74,33 +82,33 @@
             <tbody class="table-group-divider">
             {% for sortie in sorties %}
                 {% if sortie.etat.libelle != 'En création' or (sortie.organisateur.pseudo == 'TODO_UTILISATEUR_CONNECTE.PSEUDO' and sortie.etat.libelle == 'En création') %}
-                <tr>
-                    <td>{{ sortie.nom|capitalize }}</td>
-                    <td>{{ sortie.dateHeureDebut|format_datetime(pattern: "dd/MM/yyyy à hh:mm") }}</td>
-                    <td>{{ sortie.dateLimiteInscription|format_datetime(pattern: "dd/MM/yyyy") }}</td>
-                    <td>{{ sortie.participants|length }} / {{ sortie.NbInscriptionMax }}</td>
-                    <td>{{ sortie.etat.libelle }}</td>
-                    <td>{% if sortie.participants|find(p => p.id == 0) != null %}
-                            X
-                        {% endif %}</td>
-                    <td>{{ sortie.organisateur.pseudo }}</td>
-                    <td>
-                        {% if sortie.dateHeureDebut|date <= today|date %}
-                            <button type="button" class="btn btn-primary">Afficher</button>
-                        {% endif %}
-                        {% if sortie.etat.libelle == 'En création'%}
-                            <button type="button" class="btn btn-primary">Modifier</button>
-                            <button type="button" class="btn btn-primary">Publier</button>
-                            <button type="button" class="btn btn-danger">Supprimer</button>
-                        {% else %}
-                            {% if sortie.participants|find(p => p.id == 0) != null %}
-                                <button type="button" class="btn btn-primary">Se désister</button>
-                            {% else %}
-                                <button type="button" class="btn btn-primary">S'inscrire</button>
+                    <tr>
+                        <td>{{ sortie.nom|capitalize }}</td>
+                        <td>{{ sortie.dateHeureDebut|format_datetime(pattern: "dd/MM/yyyy à hh:mm") }}</td>
+                        <td>{{ sortie.dateLimiteInscription|format_datetime(pattern: "dd/MM/yyyy") }}</td>
+                        <td>{{ sortie.participants|length }} / {{ sortie.NbInscriptionMax }}</td>
+                        <td>{{ sortie.etat.libelle }}</td>
+                        <td>{% if sortie.participants|find(p => p.id == 0) != null %}
+                                X
+                            {% endif %}</td>
+                        <td>{{ sortie.organisateur.pseudo }}</td>
+                        <td>
+                            {% if sortie.dateHeureDebut|date <= today|date %}
+                                <button type="button" class="btn btn-primary">Afficher</button>
                             {% endif %}
-                        {% endif %}
-                    </td>
-                </tr>
+                            {% if sortie.etat.libelle == 'En création' %}
+                                <button type="button" class="btn btn-primary">Modifier</button>
+                                <button type="button" class="btn btn-primary">Publier</button>
+                                <button type="button" class="btn btn-danger">Supprimer</button>
+                            {% else %}
+                                {% if sortie.participants|find(p => p.id == 0) != null %}
+                                    <button type="button" class="btn btn-primary">Se désister</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-primary">S'inscrire</button>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
                 {% endif %}
             {% endfor %}
             </tbody>
