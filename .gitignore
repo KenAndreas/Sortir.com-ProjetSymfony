@@ -26,4 +26,3 @@
 ###< symfony/asset-mapper ###
 ###ignore mes réglages php storm
 /.idea
-.env.dev
