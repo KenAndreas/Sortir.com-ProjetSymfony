@@ -48,9 +48,9 @@ class Sortie
     private ?Participant $organisateur = null;
 
     /**
-     * @var Collection<int, participant>
+     * @var Collection<int, Participant>
      */
-    #[ORM\ManyToMany(targetEntity: participant::class, inversedBy: 'sorties')]
+    #[ORM\ManyToMany(targetEntity: Participant::class, inversedBy: 'sorties')]
     private Collection $participants;
 
     public function __construct()
@@ -178,12 +178,12 @@ class Sortie
         return $this;
     }
 
-    public function getOrganisateur(): ?participant
+    public function getOrganisateur(): ?Participant
     {
         return $this->organisateur;
     }
 
-    public function setOrganisateur(?participant $organisateur): static
+    public function setOrganisateur(Participant $organisateur): static
     {
         $this->organisateur = $organisateur;
 
@@ -191,14 +191,14 @@ class Sortie
     }
 
     /**
-     * @return Collection<int, participant>
+     * @return Collection<int, Participant>
      */
     public function getParticipants(): Collection
     {
         return $this->participants;
     }
 
-    public function addParticipant(participant $participant): static
+    public function addParticipant(Participant $participant): static
     {
         if (!$this->participants->contains($participant)) {
             $this->participants->add($participant);
@@ -207,7 +207,7 @@ class Sortie
         return $this;
     }
 
-    public function removeParticipant(participant $participant): static
+    public function removeParticipant(Participant $participant): static
     {
         $this->participants->removeElement($participant);
 
