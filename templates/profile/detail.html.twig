@@ -1,0 +1,35 @@
+{# templates/participant/detail.html.twig #}
+{% extends 'base.html.twig' %}
+{% block title %}Detail du Profil{% endblock %}
+
+
+
+{% block body %}
+<h1>Détails du participant {{ participant.pseudo }}</h1>
+
+<table>
+    <tr>
+        <th>Nom</th>
+        <td>{{ participant.nom }}</td>
+    </tr>
+    <tr>
+        <th>Prénom</th>
+        <td>{{ participant.prenom }}</td>
+    </tr>
+    <tr>
+        <th>Email</th>
+        <td>{{ participant.mail }}</td>
+    </tr>
+    <tr>
+        <th>Téléphone</th>
+        <td>{{ participant.telephone }}</td>
+    </tr>
+    <tr>
+        <th>Pseudo</th>
+        <td>{{ participant.pseudo }}</td>
+    </tr>
+    {# Vous pouvez ajouter d'autres informations si nécessaire #}
+</table>
+
+
+{% endblock %}

@@ -5,15 +5,17 @@ namespace App\Controller;
 
 use App\Entity\Participant;
 use App\Form\ProfileType;
+use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;  // Importation de UserPasswordHasherInterface
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;// Importation de UserPasswordHasherInterface
 
 class ProfileController extends AbstractController
 {
+
 #[Route('/mon-profil', name: 'app_mon-profile', methods: ['GET', 'POST'])]
 public function edit(Request $request, UserInterface $user, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager)
 {
@@ -54,4 +56,19 @@ return $this->render('profile/edit.html.twig', [
 'form' => $form->createView(),
 ]);
 }
+
+#[Route('/detail-profil/{id}', name: 'app_detail_participant')]
+  public function show(int $id, EntityManagerInterface $em): Response
+    {
+        // Récupérer l'entité Participant par ID
+        $participant = $em->getRepository(Participant::class)->find($id);
+
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant non trouvé');
+        }
+
+        return $this->render('profile/detail.html.twig', [
+            'participant' => $participant,
+        ]);
+    }
 }

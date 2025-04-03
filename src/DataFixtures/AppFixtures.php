@@ -18,7 +18,6 @@ class AppFixtures extends Fixture
 {
 private UserPasswordHasherInterface $passwordHasher;
 
-// Injectez le service UserPasswordHasherInterface via le constructeur
 public function __construct(UserPasswordHasherInterface $passwordHasher)
 {
 $this->passwordHasher = $passwordHasher;
@@ -57,7 +56,7 @@ $lieu2->setNom('Place Bellecour')
 ->setVille($ville2);
 $manager->persist($lieu2);
 
-// Création d'états
+// Création des états
 $etat1 = new Etat();
 $etat1->setLibelle('En création');
 $manager->persist($etat1);
@@ -70,7 +69,7 @@ $etat3 = new Etat();
 $etat3->setLibelle('Clôturée');
 $manager->persist($etat3);
 
-// Création de campus
+// Création des campus
 $campus1 = new Campus();
 $campus1->setNom('Université Paris 1');
 $manager->persist($campus1);
@@ -79,7 +78,7 @@ $campus2 = new Campus();
 $campus2->setNom('Université Lyon 2');
 $manager->persist($campus2);
 
-// Création de participants (Utilisation de Faker pour les noms, prénoms, mails, etc.)
+// Création de participants avec mot de passe haché
 $participant1 = new Participant();
 $participant1->setNom($faker->lastName)
 ->setPrenom($faker->firstName)
@@ -88,11 +87,8 @@ $participant1->setNom($faker->lastName)
 ->setActif(true)
 ->setPseudo($faker->userName)
 ->setCampus($campus1);
-
-// Hachage du mot de passe avant de le persister
 $hashedPassword = $this->passwordHasher->hashPassword($participant1, 'password');
 $participant1->setMotDePasse($hashedPassword);
-
 $manager->persist($participant1);
 
 $participant2 = new Participant();
@@ -103,25 +99,27 @@ $participant2->setNom($faker->lastName)
 ->setActif(true)
 ->setPseudo($faker->userName)
 ->setCampus($campus2);
-
-// Hachage du mot de passe avant de le persister
 $hashedPassword = $this->passwordHasher->hashPassword($participant2, 'password');
 $participant2->setMotDePasse($hashedPassword);
-
 $manager->persist($participant2);
 
 // Création de sorties
 $sortie1 = new Sortie();
-$sortie1->setNom('Sortie culturelle')
+$sortie1->setNom('Concert de Rock')
 ->setDateHeureDebut($faker->dateTimeThisYear)
-->setDuree(new \DateTime('01:30:00'))
+->setDuree(new \DateTime('02:00:00'))
 ->setDateLimiteInscription($faker->dateTimeBetween('-1 week', 'now'))
-->setNbInscriptionMax(30)
-->setInfosSortie('Visite guidée de la Tour Eiffel')
+->setNbInscriptionMax(100)
+->setInfosSortie('Concert au Stade de France')
 ->setEtat($etat1)
 ->setCampus($campus1)
 ->setLieu($lieu1)
 ->setOrganisateur($participant1);
+
+// Associer les participants à la sortie
+$sortie1->addParticipant($participant1);
+$sortie1->addParticipant($participant2);  // Ajoute participant2 à la sortie1
+
 $manager->persist($sortie1);
 
 $sortie2 = new Sortie();
@@ -135,9 +133,14 @@ $sortie2->setNom('Sortie sportive')
 ->setCampus($campus2)
 ->setLieu($lieu2)
 ->setOrganisateur($participant2);
+
+// Ajouter les participants à cette sortie
+$sortie2->addParticipant($participant1);
+$sortie2->addParticipant($participant2);  // Ajoute participant2 à la sortie2
+
 $manager->persist($sortie2);
 
-// Flush les données dans la base
+// Finalisation de la persistance des données
 $manager->flush();
 }
 }

@@ -75,7 +75,7 @@
         <tbody>
         {% for p in sortie.participants %}
             <tr>
-                <td><a href="#TODO">{{ p.pseudo }}</a></td>
+                <td><a href="{{ path('app_detail_participant', {id: p.id}) }}">{{ p.pseudo }}</a></td>
                 <td>{{ p.nom }}</td>
             </tr>
         {% endfor %}
