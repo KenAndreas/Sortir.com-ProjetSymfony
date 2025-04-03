@@ -1,0 +1,4 @@
+select.form-select, select.form-select-sm{
+    background-position: right 0.5rem center;
+    padding: 0.25rem 1.75rem 0.25rem 0.75rem !important;
+}

@@ -8,6 +8,7 @@ use App\Entity\Lieu;
 use App\Entity\Participant;
 use App\Entity\Sortie;
 use App\Entity\Ville;
+use App\Form\SortieType;
 use App\Repository\SortieRepository;
 use App\Service\SortieService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,10 +19,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class SortieController extends AbstractController
 {
-    #[Route('/', name: 'app_sortie', methods: ['GET'])]
+    #[Route('/', name: 'home', methods: ['GET'])]
     public function index(EntityManagerInterface $em): Response
     {
-        return $this->render('sortie/index.html.twig', [
+        return $this->render('sortie/home.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
             'sorties' => $em->getRepository(Sortie::class)->findAll(),
             'today' => new \DateTime(),
@@ -63,7 +64,7 @@ final class SortieController extends AbstractController
             $sorties = $service->filterByEtatClose($sorties, $etat);
         }
 
-        return $this->render('sortie/index.html.twig', [
+        return $this->render('home.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
             'sorties' => $sorties,
             'today' => new \DateTime(),
@@ -71,10 +72,25 @@ final class SortieController extends AbstractController
         ]);
     }
 
+    #[Route('/sortie/{id}', name: 'show_sortie', requirements: ['id' =>'\d+'], methods: ['GET'])]
+    public function getSortie(int $id,SortieRepository $sortieRepository): Response
+    {
+        $sortie = $sortieRepository->find($id);
+        if($sortie) {
+            return $this->render('sortie/showSortie.html.twig', [
+                'sortie' => $sortie,
+            ]);
+        }else{
+            return $this->redirectToRoute('app_error');
+        }
+    }
+
     #[Route('/sortie/create', name: 'create_sortie', methods: ['GET', 'POST'])]
     public function createSortie(Request $request,EntityManagerInterface $em): Response
     {
+        $sortie = new Sortie();
         //vérifier utilisateur
+
         //vérifier sortie
         //si ok pousser
         return $this->render('sortie/sortieForm.html.twig', [
@@ -83,19 +99,8 @@ final class SortieController extends AbstractController
             'lieux' => $em->getRepository(Lieu::class)->findAll(),
             'sorties' => $em->getRepository(Sortie::class)->findAll(),
             'today' => new \DateTime(),
+            'create' => true,
+            'form' => $this->createForm(SortieType::class, $sortie ),
         ]);
-    }
-
-    #[Route('/sortie', name: 'show_sortie', requirements: ['id' =>'\d+'], methods: ['GET'])]
-    public function getSortie(int $id,SortieRepository $sortieRepository): Response
-    {
-        $sortie = $sortieRepository->find($id);
-        if($sortie) {
-            return $this->render('sortie/showSortie.html.twig', [
-                'sortie' => $sortie
-            ]);
-        }else{
-            return $this->redirectToRoute('app_error');
-        }
     }
 }
