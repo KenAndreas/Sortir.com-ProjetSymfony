@@ -2,3 +2,34 @@ select.form-select, select.form-select-sm{
     background-position: right 0.5rem center;
     padding: 0.25rem 1.75rem 0.25rem 0.75rem !important;
 }
+
+#sortie{
+    display: flex;
+    gap: 2%;
+    flex-flow: wrap;
+}
+
+#sortie .col{
+    width: 48%;
+    position: relative;
+    flex-flow: column;
+}
+
+#sortie .large{
+    width: 100%;
+}
+
+.form-group{
+    display: flex;
+    flex-flow: nowrap;
+    width: 50%;
+}
+
+.button-group{
+justify-content: space-evenly;
+    margin: 1rem 0;
+}
+
+.button-group a{
+    width: fit-content;
+}

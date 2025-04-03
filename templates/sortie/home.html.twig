@@ -95,7 +95,7 @@
                         {% endif %}</td>
                     <td>{{ sortie.organisateur.pseudo }}</td>
                     <td>
-                        {% if sortie.dateHeureDebut|date <= today|date %}
+                        {% if sortie.etat.libelle != 'En création' %}
                             <a href="{{ path('show_sortie',{ id: sortie.id }) }}">
                                 <button type="button" class="btn btn-primary">Afficher</button>
                             </a>

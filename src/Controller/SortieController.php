@@ -64,7 +64,7 @@ final class SortieController extends AbstractController
             $sorties = $service->filterByEtatClose($sorties, $etat);
         }
 
-        return $this->render('home.html.twig', [
+        return $this->render('sortie/home.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
             'sorties' => $sorties,
             'today' => new \DateTime(),
