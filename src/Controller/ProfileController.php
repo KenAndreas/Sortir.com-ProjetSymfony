@@ -45,8 +45,8 @@ $entityManager->flush();
 // Message de confirmation
 $this->addFlash('success', 'Votre profil a été mis à jour avec succès.');
 
-// Rediriger vers la page du profil après la mise à jour
-return $this->redirectToRoute('app_mon-profile');
+// Rediriger vers la page d'accueil après la mise à jour
+return $this->redirectToRoute('home');
 }
 
 // Rendu du formulaire pour afficher les champs et les erreurs si nécessaire
