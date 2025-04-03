@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello CampusController!{% endblock %}
+
+{% block body %}
+    <h1>Créer une sortie</h1>
+
+    {{ form_start(form) }}
+    <div id="sortie">
+        {{ form_errors(form) }}
+        <div class="col">
+            <div class="row form-group">
+                {{ form_label(form.nom) }}
+                {{ form_widget(form.nom) }}
+            </div>
+            <div class="row form-group">
+                {{ form_label(form.dateHeureDebut) }}
+                {{ form_widget(form.dateHeureDebut) }}
+            </div>
+            <div class="row form-group">
+                {{ form_label(form.dateLimiteInscription) }}
+                {{ form_widget(form.dateLimiteInscription) }}
+            </div>
+            <div class="row form-group">
+                {{ form_label(form.nbInscriptionMax) }}
+                {{ form_widget(form.nbInscriptionMax) }}
+            </div>
+            <div class="row form-group">
+                {{ form_label(form.duree) }}
+                {{ form_widget(form.duree) }}
+            </div>
+        </div>
+        <div class="col">
+            <div class="row form-group">
+                {{ form_label(form.campus) }}
+                {{ form_widget(form.campus) }}
+            </div>
+            <div class="row form-group">
+                {{ form_label(form.lieu) }}
+                {{ form_widget(form.lieu) }}
+            </div>
+        </div>
+        <div class="row large">
+            {{ form_label(form.infosSortie) }}
+            {{ form_widget(form.infosSortie) }}
+        </div>
+        <div class="row large button-group">
+            {{ form_widget(form.etatSave) }}
+            {{ form_widget(form.etatPost) }}
+            <a href="{{ path('home') }}">
+                <button type="button" class="btn btn-primary">Retour à la liste</button>
+            </a>
+        </div>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}
