@@ -1,20 +1,43 @@
-{# templates/profile/edit.html.twig #}
-
 {% extends 'base.html.twig' %}
 
 {% block title %}Modifier mon profil{% endblock %}
 
 {% block body %}
-    <h1>Modifier votre profil</h1>
+    <div class="container mt-4">
+        <h1 class="mb-4">Modifier votre profil</h1>
 
-    {{ form_start(form) }}
-    {{ form_row(form.campus) }}
-    {{ form_row(form.prenom) }}
-    {{ form_row(form.nom) }}
-    {{ form_row(form.pseudo) }}
-    {{ form_row(form.mail) }}
-    {{ form_row(form.telephone) }}
-    {{ form_row(form.motDePasse) }}
-    <button type="submit">Mettre à jour</button>
-    {{ form_end(form) }}
+        {{ form_start(form) }}
+
+        <div class="mb-1">
+            {{ form_row(form.campus, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="mb-1">
+            {{ form_row(form.prenom, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="mb-1">
+            {{ form_row(form.nom, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="mb-1">
+            {{ form_row(form.pseudo, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="mb-1">
+            {{ form_row(form.mail, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="mb-1">
+            {{ form_row(form.telephone, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="mb-1">
+            {{ form_row(form.motDePasse, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-2">Mettre à jour</button>
+
+        {{ form_end(form) }}
+    </div>
 {% endblock %}
