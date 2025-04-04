@@ -141,4 +141,20 @@ final class SortieController extends AbstractController
             'form' => $form,
         ]);
     }
+
+
+    #[Route('/detail-profil/{id}', name: 'app_detail_participant')]
+    public function show(int $id, EntityManagerInterface $em): Response
+    {
+        // Récupérer l'entité Participant par ID
+        $participant = $em->getRepository(Participant::class)->find($id);
+
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant non trouvé');
+        }
+
+        return $this->render('profile/detail.html.twig', [
+            'participant' => $participant,
+        ]);
+    }
 }
