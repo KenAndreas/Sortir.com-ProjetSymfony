@@ -142,19 +142,18 @@ final class SortieController extends AbstractController
             'form' => $form,
         ]);
     }
-
-
     #[Route('/sortie/update/{id}', name: 'update_sortie', requirements: ['id' =>'\d+'], methods: ['GET', 'POST'])]
     public function updateSortie(int $id, Request $request,EntityManagerInterface $em): Response
     {
         $sortie = new Sortie();
         $form = $this->createForm(SortieType::class, $sortie );
         if($request->getMethod() == "POST"){
-            $initSortie = $em->getRepository(Sortie::class)->find($id);
+            $initSortie = $em->getRepository(Sortie::class)->find($request->get('id'));
             $form->handleRequest($request);
             $user = $this->getUser();
             //vérifier utilisateur
             if ($user != null && $user->getPseudo() == $initSortie->getOrganisateur()->getPseudo()) {
+                $orga = $initSortie->getOrganisateur();
                 if ($form->isSubmitted() && $form->isValid()) {
                     $sortie = $initSortie;
                     //Ajout des données validées
@@ -204,7 +203,6 @@ final class SortieController extends AbstractController
 
         if($user === $sortie->getOrganisateur()){
             $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Ouverte']));
-            $em->flush($sortie);
         }else{
             return $this->redirectToRoute('app_error',[
                 'message' => "403"
@@ -216,7 +214,6 @@ final class SortieController extends AbstractController
             'sorties' => $em->getRepository(Sortie::class)->findAll(),
             'today' => new \DateTime(),
             'filterForm' => $request,
-            'user' => $user,
-        ]);
+            'user' => $user,]);
     }
 }
