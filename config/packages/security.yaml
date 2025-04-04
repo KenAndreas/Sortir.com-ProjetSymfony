@@ -30,4 +30,7 @@ security:
 
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/sortie/create, roles: ROLE_USER}
+        - { path: ^/sortie/update, roles: ROLE_USER}
+        - { path: ^/sortie/delete, roles: ROLE_USER}
         - { path: ^/profile, roles: ROLE_USER }

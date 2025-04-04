@@ -22,10 +22,13 @@ final class SortieController extends AbstractController
     #[Route('/', name: 'home', methods: ['GET'])]
     public function index(EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
+        $user = $em->getRepository(Participant::class)->findOneBy(['id' => $user->getId()]);
         return $this->render('sortie/home.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
             'sorties' => $em->getRepository(Sortie::class)->findAll(),
             'today' => new \DateTime(),
+            'user' => $user,
         ]);
     }
 
@@ -85,14 +88,45 @@ final class SortieController extends AbstractController
         }
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
     #[Route('/sortie/create', name: 'create_sortie', methods: ['GET', 'POST'])]
     public function createSortie(Request $request,EntityManagerInterface $em): Response
     {
         $sortie = new Sortie();
-        //vérifier utilisateur
+        $form = $this->createForm(SortieType::class, $sortie );
 
-        //vérifier sortie
-        //si ok pousser
+        $form->handleRequest($request);
+        //vérifier utilisateur
+        if ($this->getUser()) {
+            $user = $this->getUser();
+            $orga = $em->getRepository(Participant::class)->findOneBy(['pseudo' => $user->getPseudo()]);
+            if ($form->isSubmitted() && $form->isValid()) {
+                //Ajout des données validées
+                $sortie->setNom($form->get('nom')->getData());
+                $sortie->setDateHeureDebut($form->get('dateHeureDebut')->getData());
+                $sortie->setDuree($form->get('duree')->getData());
+                $sortie->setDateHeureDebut($form->get('dateHeureDebut')->getData());
+                $sortie->setNbInscriptionMax($form->get('nbInscriptionMax')->getData());
+                $sortie->setInfosSortie($form->get('infosSortie')->getData());
+                if($form->has('etatSave')) {
+                    $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'En création']));
+                }else{
+                    $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Ouverte']));
+                }
+                $sortie->setCampus($em->getRepository(Campus::class)->findOneBy(['id' => $form->get('campus')->getData()]));
+                $sortie->setLieu($em->getRepository(Lieu::class)->findOneBy(['id' => $form->get('lieu')->getData()]));
+                $sortie->setOrganisateur($orga);
+
+                $em->persist($orga);
+                $em->persist($sortie);
+
+                $em->flush();
+                $this->addFlash('success', 'Votre sortie a bien été' . $form->has('etatSave') ? 'enregistrée !' : 'crée !');
+                return $this->redirectToRoute('home');
+            }
+        }
         return $this->render('sortie/sortieForm.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
             'villes' => $em->getRepository(Ville::class)->findAll(),
@@ -100,7 +134,7 @@ final class SortieController extends AbstractController
             'sorties' => $em->getRepository(Sortie::class)->findAll(),
             'today' => new \DateTime(),
             'create' => true,
-            'form' => $this->createForm(SortieType::class, $sortie ),
+            'form' => $form,
         ]);
     }
 }
