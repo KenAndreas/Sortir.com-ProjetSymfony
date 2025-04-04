@@ -101,7 +101,7 @@
                             </a>
                         {% endif %}
                         {% if sortie.etat.libelle == 'En création' and user != null and user.pseudo == sortie.organisateur.pseudo %}
-                            <button type="button" class="btn btn-primary">Modifier</button>
+                            <a href="{{ path('update_sortie', { id: sortie.id }) }}"><button type="button" class="btn btn-primary">Modifier</button></a>
                             <button type="button" class="btn btn-primary">Publier</button>
                             <button type="button" class="btn btn-danger">Supprimer</button>
                         {% else %}
