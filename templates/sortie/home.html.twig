@@ -139,7 +139,9 @@
                                     </a>
                                 {% endif %}
                             {% else %}
-                                <span class="text-muted">Veuillez vous connecter pour vous inscrire</span>
+                                <a href="{{ path('inscription_sortie', { 'id': sortie.id, 'p_id': user.id }) }}">
+                                    <button type="button" class="btn btn-primary">S'inscrire</button>
+                                </a>
                             {% endif %}
                         {% endif %}
                     </td>

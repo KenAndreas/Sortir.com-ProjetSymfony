@@ -54,17 +54,21 @@ final class SortieController extends AbstractController
             $request->request->get('dateDebut'),
             $request->request->get('dateFin'));
 
-        //TODO ajouter USER
-        $falseUser = $em->getRepository(Participant::class)->findOneBy(['pseudo' => 'Gégé']);
+
+        $user = $this->getUser();
+        if ($user != null) {
+            $user = $this->getUser();
+            $user = $em->getRepository(Participant::class)->findOneBy(['id' => $user->getId()]);
+        }
 
         if ($request->request->has('checkOrga')) {
-            $sorties = $service->filterByOrga($sorties, $falseUser);
+            $sorties = $service->filterByOrga($sorties, $user);
         }
         if ($request->request->has('checkInscrit')) {
-            $sorties = $service->filterByInscrit($sorties, $falseUser);
+            $sorties = $service->filterByInscrit($sorties, $user);
         }
         if ($request->request->has('checkNoInscrit')) {
-            $sorties = $service->filterByNonInscrit($sorties, $falseUser);
+            $sorties = $service->filterByNonInscrit($sorties, $user);
         }
         if ($request->request->has('checkClose')) {
             $etat = $em->getRepository(Etat::class)->findOneBy(['libelle' => 'Terminée']);
@@ -74,8 +78,8 @@ final class SortieController extends AbstractController
         return $this->render('sortie/home.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
             'sorties' => $sorties,
-            'today' => new \DateTime(),
             'filterForm' => $request,
+            'user' => $user,
         ]);
     }
 
@@ -142,6 +146,130 @@ final class SortieController extends AbstractController
         ]);
     }
 
+    #[Route('/sortie/update/{id}', name: 'update_sortie', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function updateSortie(int $id, Request $request, EntityManagerInterface $em): Response
+    {
+        $sortie = new Sortie();
+        $form = $this->createForm(SortieType::class, $sortie);
+        if ($request->getMethod() == "POST") {
+            $initSortie = $em->getRepository(Sortie::class)->find($request->get('id'));
+            $form->handleRequest($request);
+            $user = $this->getUser();
+            //vérifier utilisateur
+            if ($user != null && $user->getPseudo() == $initSortie->getOrganisateur()->getPseudo()) {
+                $orga = $initSortie->getOrganisateur();
+                if ($form->isSubmitted() && $form->isValid()) {
+                    $sortie = $initSortie;
+                    //Ajout des données validées
+                    $sortie->setNom($form->get('nom')->getData());
+                    $sortie->setDateHeureDebut($form->get('dateHeureDebut')->getData());
+                    $sortie->setDuree($form->get('duree')->getData());
+                    $sortie->setDateLimiteInscription($form->get('dateLimiteInscription')->getData());
+                    $sortie->setNbInscriptionMax($form->get('nbInscriptionMax')->getData());
+                    $sortie->setInfosSortie($form->get('infosSortie')->getData());
+                    if ($form->has('etatSave')) {
+                        $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'En création']));
+                    } else {
+                        $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Ouverte']));
+                    }
+                    $sortie->setCampus($em->getRepository(Campus::class)->findOneBy(['id' => $form->get('campus')->getData()]));
+                    $sortie->setLieu($em->getRepository(Lieu::class)->findOneBy(['id' => $form->get('lieu')->getData()]));
+
+                    $em->flush();
+                    $this->addFlash('success', 'Votre sortie a bien été' . $form->has('etatSave') ? 'enregistrée !' : 'modifiée !');
+                    return $this->redirectToRoute('home',[
+                        'campus' => $em->getRepository(Campus::class)->findAll(),
+                        'sorties' => $em->getRepository(Sortie::class)->findAll(),
+                        'user' => $user,
+                    ]);
+                }
+            } else {
+                return $this->redirectToRoute('app_error', [
+                    'message' => "403"
+                ]);
+            }
+        } else {
+            $form = $this->createForm(SortieType::class, $em->getRepository(Sortie::class)->find($request->get('id')));
+        }
+
+        return $this->render('sortie/sortieForm.html.twig', [
+            'campus' => $em->getRepository(Campus::class)->findAll(),
+            'villes' => $em->getRepository(Ville::class)->findAll(),
+            'lieux' => $em->getRepository(Lieu::class)->findAll(),
+            'sorties' => $em->getRepository(Sortie::class)->findAll(),
+            'create' => true,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/sortie/publier/{id}', name: 'post_sortie', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function postSortie(Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        $sortie = $em->getRepository(Sortie::class)->find($request->get('id'));
+
+        if ($user === $sortie->getOrganisateur()) {
+            $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Ouverte']));
+
+            $em->flush();
+        } else {
+            return $this->redirectToRoute('app_error', [
+                'message' => "403"
+            ]);
+        }
+
+        return $this->redirectToRoute('home', [
+            'campus' => $em->getRepository(Campus::class)->findAll(),
+            'sorties' => $em->getRepository(Sortie::class)->findAll(),
+            'user' => $user,]);
+    }
+
+    #[Route('/sortie/delete/{id}', name: 'delete_sortie', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function deleteSortie(Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        $sortie = $em->getRepository(Sortie::class)->find($request->get('id'));
+
+        if ($user === $sortie->getOrganisateur()) {
+            $em->remove($sortie);
+            $em->flush();
+        } else {
+            return $this->redirectToRoute('app_error', [
+                'message' => "403"
+            ]);
+        }
+
+        return $this->redirectToRoute('home', [
+            'campus' => $em->getRepository(Campus::class)->findAll(),
+            'sorties' => $em->getRepository(Sortie::class)->findAll(),
+            'user' => $user,]);
+    }
+
+    #[Route('/sortie/annuler/{id}', name: 'annuler_sortie', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function annuleSortie(int $id, Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        $sortie = $em->getRepository(Sortie::class)->find($id);
+
+        if ($user === $sortie->getOrganisateur()
+            && $sortie->getDateHeureDebut() > new \DateTime('now')
+            && ($sortie->getEtat()->getLibelle() != 'En création' || $sortie->getEtat()->getLibelle() != 'Annulée')&& $request->get('motif') != null) {
+
+            $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Annulée']));
+            $sortie->setInfosSortie('Annulée : ' . $request->get('motif') . ' - ' .
+                $em->getRepository(Sortie::class)->findOneBy(['id' => $id])->getInfosSortie());
+            $em->flush();
+        } else {
+            return $this->render('sortie/showSortie.html.twig', [
+                'sortie' => $sortie,
+                'annulation' => true]);
+        }
+
+        return $this->render('sortie/home.html.twig', [
+            'campus' => $em->getRepository(Campus::class)->findAll(),
+            'sorties' => $em->getRepository(Sortie::class)->findAll(),
+            'user' => $user,]);
+    }
 
     #[Route('/sortie/inscription/{id}/{p_id}', name: 'inscription_sortie')]
     public function inscrireSortie(int $id, int $p_id, EntityManagerInterface $em): Response
