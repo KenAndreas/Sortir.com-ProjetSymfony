@@ -8,6 +8,7 @@ use App\Form\ProfileType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -54,6 +55,21 @@ class ProfileController extends AbstractController
         // Rendu du formulaire pour afficher les champs et les erreurs si nécéssaire
         return $this->render('profile/edit.html.twig', [
             'form' => $form->createView(),
+        ]);
+    }
+
+    #[\Symfony\Component\Routing\Attribute\Route('/detail-profil/{id}', name: 'app_detail_participant')]
+    public function show(int $id, EntityManagerInterface $em): Response
+    {
+        // Récupérer l'entité Participant par ID
+        $participant = $em->getRepository(Participant::class)->find($id);
+
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant non trouvé');
+        }
+
+        return $this->render('profile/detail.html.twig', [
+            'participant' => $participant,
         ]);
     }
 }
