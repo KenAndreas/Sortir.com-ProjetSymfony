@@ -23,7 +23,11 @@ final class SortieController extends AbstractController
     public function index(EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
-        $user = $em->getRepository(Participant::class)->findOneBy(['id' => $user->getId()]);
+        if($user != null){
+            $user = $this->getUser();
+            $user = $em->getRepository(Participant::class)->findOneBy(['id' => $user->getId()]);
+        }
+
         return $this->render('sortie/home.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
             'sorties' => $em->getRepository(Sortie::class)->findAll(),
@@ -135,6 +139,22 @@ final class SortieController extends AbstractController
             'today' => new \DateTime(),
             'create' => true,
             'form' => $form,
+        ]);
+    }
+
+
+    #[Route('/detail-profil/{id}', name: 'app_detail_participant')]
+    public function show(int $id, EntityManagerInterface $em): Response
+    {
+        // Récupérer l'entité Participant par ID
+        $participant = $em->getRepository(Participant::class)->find($id);
+
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant non trouvé');
+        }
+
+        return $this->render('profile/detail.html.twig', [
+            'participant' => $participant,
         ]);
     }
 }

@@ -83,7 +83,7 @@
         </thead>
         <tbody class="table-group-divider">
         {% for sortie in sorties %}
-            {% if sortie.etat.libelle != 'En création' or (sortie.organisateur.pseudo == user.pseudo and sortie.etat.libelle == 'En création') %}
+            {% if sortie.etat.libelle != 'En création' or ( user != null and sortie.organisateur.pseudo == user.pseudo and sortie.etat.libelle == 'En création') %}
                 <tr>
                     <td>{{ sortie.nom|capitalize }}</td>
                     <td>{{ sortie.dateHeureDebut|format_datetime(pattern: "dd/MM/yyyy à hh:mm") }}</td>
@@ -100,7 +100,7 @@
                                 <button type="button" class="btn btn-primary">Afficher</button>
                             </a>
                         {% endif %}
-                        {% if sortie.etat.libelle == 'En création' and user.pseudo == sortie.organisateur.pseudo %}
+                        {% if sortie.etat.libelle == 'En création' and user != null and user.pseudo == sortie.organisateur.pseudo %}
                             <button type="button" class="btn btn-primary">Modifier</button>
                             <button type="button" class="btn btn-primary">Publier</button>
                             <button type="button" class="btn btn-danger">Supprimer</button>
