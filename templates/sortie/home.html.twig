@@ -83,7 +83,7 @@
         </thead>
         <tbody class="table-group-divider">
         {% for sortie in sorties %}
-            {% if sortie.etat.libelle != 'En création' or ( user != null and sortie.organisateur.pseudo == user.pseudo and sortie.etat.libelle == 'En création') %}
+            {% if sortie.etat.libelle != 'En création' or ( user != null and sortie.organisateur.pseudo == user.userIdentifier and sortie.etat.libelle == 'En création') %}
                 <tr>
                     <td>{{ sortie.nom|capitalize }}</td>
                     <td>{{ sortie.dateHeureDebut|format_datetime(pattern: "dd/MM/yyyy à hh:mm") }}</td>
@@ -99,16 +99,29 @@
                             <a href="{{ path('show_sortie',{ id: sortie.id }) }}">
                                 <button type="button" class="btn btn-primary">Afficher</button>
                             </a>
+                            {% if sortie.dateHeureDebut > date('now') and sortie.etat.libelle != 'Annulée' %}
+                                <a href="{{ path('annuler_sortie',{ id: sortie.id }) }}">
+                                    <button type="button" class="btn btn-primary">Annuler</button>
+                                </a>
+                            {% endif %}
                         {% endif %}
-                        {% if sortie.etat.libelle == 'En création' and user != null and user.pseudo == sortie.organisateur.pseudo %}
-                            <button type="button" class="btn btn-primary">Modifier</button>
-                            <button type="button" class="btn btn-primary">Publier</button>
-                            <button type="button" class="btn btn-danger">Supprimer</button>
+                        {% if sortie.etat.libelle == 'En création' and user != null and user.userIdentifier == sortie.organisateur.pseudo %}
+                            <a href="{{ path('update_sortie', { id: sortie.id }) }}">
+                                <button type="button" class="btn btn-primary">Modifier</button>
+                            </a>
+                            <a href="{{ path('post_sortie', { id: sortie.id }) }}">
+                                <button type="button" class="btn btn-primary">Publier</button>
+                            </a>
+                            <a href="{{ path('delete_sortie',{ id: sortie.id }) }}">
+                                <button type="button" class="btn btn-danger">Supprimer</button>
+                            </a>
                         {% else %}
-                            {% if sortie.participants|find(p => p.id == 0) != null %}
-                                <button type="button" class="btn btn-primary">Se désister</button>
-                            {% else %}
-                                <button type="button" class="btn btn-primary">S'inscrire</button>
+                            {% if sortie.etat.libelle != ('Clôturée' or 'Annulée' or 'Terminée') %}
+                                {% if sortie.participants|find(p => p.id == 0) != null %}
+                                    <button type="button" class="btn btn-primary">Se désister</button>
+                                {% else %}
+                                    <button type="button" class="btn btn-primary">S'inscrire</button>
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                     </td>
