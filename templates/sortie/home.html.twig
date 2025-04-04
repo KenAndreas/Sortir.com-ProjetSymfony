@@ -102,7 +102,7 @@
                         {% endif %}
                         {% if sortie.etat.libelle == 'En création' and user != null and user.pseudo == sortie.organisateur.pseudo %}
                             <a href="{{ path('update_sortie', { id: sortie.id }) }}"><button type="button" class="btn btn-primary">Modifier</button></a>
-                            <button type="button" class="btn btn-primary">Publier</button>
+                            <a href="{{ path('post_sortie', { id: sortie.id }) }}"><button type="button" class="btn btn-primary">Publier</button></a>
                             <button type="button" class="btn btn-danger">Supprimer</button>
                         {% else %}
                             {% if sortie.participants|find(p => p.id == 0) != null %}

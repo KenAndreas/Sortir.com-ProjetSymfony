@@ -150,12 +150,11 @@ final class SortieController extends AbstractController
         $sortie = new Sortie();
         $form = $this->createForm(SortieType::class, $sortie );
         if($request->getMethod() == "POST"){
-            $initSortie = $em->getRepository(Sortie::class)->find($request->get('id'));
+            $initSortie = $em->getRepository(Sortie::class)->find($id);
             $form->handleRequest($request);
             $user = $this->getUser();
             //vérifier utilisateur
             if ($user != null && $user->getPseudo() == $initSortie->getOrganisateur()->getPseudo()) {
-                $orga = $initSortie->getOrganisateur();
                 if ($form->isSubmitted() && $form->isValid()) {
                     $sortie = $initSortie;
                     //Ajout des données validées
@@ -205,6 +204,7 @@ final class SortieController extends AbstractController
 
         if($user === $sortie->getOrganisateur()){
             $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Ouverte']));
+            $em->flush($sortie);
         }else{
             return $this->redirectToRoute('app_error',[
                 'message' => "403"
