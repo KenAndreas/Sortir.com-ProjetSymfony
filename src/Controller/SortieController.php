@@ -23,7 +23,11 @@ final class SortieController extends AbstractController
     public function index(EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
-        $user = $em->getRepository(Participant::class)->findOneBy(['id' => $user->getId()]);
+        if($user != null){
+            $user = $this->getUser();
+            $user = $em->getRepository(Participant::class)->findOneBy(['id' => $user->getId()]);
+        }
+
         return $this->render('sortie/home.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
             'sorties' => $em->getRepository(Sortie::class)->findAll(),
