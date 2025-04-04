@@ -1,35 +1,36 @@
-{# templates/participant/detail.html.twig #}
 {% extends 'base.html.twig' %}
-{% block title %}Detail du Profil{% endblock %}
 
-
+{% block title %}Détail du Profil{% endblock %}
 
 {% block body %}
-    <h1>Détails du participant {{ participant.pseudo }}</h1>
+    <div class="container mt-4">
+        <h1 class="mb-4">Détails du participant {{ participant.pseudo }}</h1>
 
-    <table>
-        <tr>
-            <th>Nom</th>
-            <td>{{ participant.nom }}</td>
-        </tr>
-        <tr>
-            <th>Prénom</th>
-            <td>{{ participant.prenom }}</td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td>{{ participant.mail }}</td>
-        </tr>
-        <tr>
-            <th>Téléphone</th>
-            <td>{{ participant.telephone }}</td>
-        </tr>
-        <tr>
-            <th>Pseudo</th>
-            <td>{{ participant.pseudo }}</td>
-        </tr>
-        {# Vous pouvez ajouter d'autres informations si nécessaire #}
-    </table>
+        <table class="table table-bordered">
+            <tbody>
+            <tr>
+                <th scope="row">Nom</th>
+                <td>{{ participant.nom }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Prénom</th>
+                <td>{{ participant.prenom }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Email</th>
+                <td>{{ participant.mail }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Téléphone</th>
+                <td>{{ participant.telephone }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Pseudo</th>
+                <td>{{ participant.pseudo }}</td>
+            </tr>
+            {# Vous pouvez ajouter d'autres informations si nécessaire #}
+            </tbody>
+        </table>
 
-
+    </div>
 {% endblock %}
