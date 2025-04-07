@@ -295,7 +295,7 @@ final class SortieController extends AbstractController
     }
 
     #[Route('/sortie/inscription/{id}/{p_id}', name: 'inscription_sortie')]
-    public function inscrireSortie(int $id, int $p_id, EntityManagerInterface $em): Response
+    public function inscrireSortie(int $id, string $p_id, EntityManagerInterface $em): Response
     {
         // Récupérer la sortie par son ID
         $sortie = $em->getRepository(Sortie::class)->find($id);
@@ -307,7 +307,7 @@ final class SortieController extends AbstractController
         }
 
         // Récupérer le participant par son ID
-        $participant = $em->getRepository(Participant::class)->find($p_id);
+        $participant = $em->getRepository(Participant::class)->findOneBy(["pseudo" => $p_id]);
 
         // Vérifier si le participant existe
         if (!$participant) {
@@ -349,7 +349,7 @@ final class SortieController extends AbstractController
 
     // Route pour se désister d'une sortie
     #[Route('/sortie/desister/{id}/{p_id}', name: 'desister_sortie', methods: ['GET'])]
-    public function desisterSortie(int $id, int $p_id, EntityManagerInterface $em): Response
+    public function desisterSortie(int $id, string $p_id, EntityManagerInterface $em): Response
     {
         // Récupérer la sortie par son ID
         $sortie = $em->getRepository(Sortie::class)->find($id);
@@ -366,8 +366,8 @@ final class SortieController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        // Récupérer le participant par son ID
-        $participant = $em->getRepository(Participant::class)->find($p_id);
+        // Récupérer le participant par son pseudo
+        $participant = $em->getRepository(Participant::class)->findOneBy(["pseudo" => $p_id]);
 
         // Vérifier si le participant existe
         if (!$participant) {
