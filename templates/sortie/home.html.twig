@@ -6,6 +6,26 @@
     <h1>Accueil</h1>
     <h2>Filtrer les sorties</h2>
 
+    <!-- Affichage des messages flash -->
+    {% for label, messages in app.flashes %}
+        <div class="alert alert-{{ label }} alert-dismissible fade show mt-3 mb-3" role="alert">
+            {% if label == 'warning' %}
+                <strong>Attention! </strong>
+            {% elseif label == 'error' %}
+                <strong>Erreur! </strong>
+            {% elseif label == 'success' %}
+                <strong>Succès! </strong>
+            {% endif %}
+            {% for message in messages %}
+                <p class="mb-0">{{ message }}</p>
+            {% endfor %}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endfor %}
+
+    <!-- Formulaire de filtre -->
     <form action="{{ path('app_sorties_filter') }}" method="post">
         <div class="container row">
             <div class="col">
@@ -64,6 +84,7 @@
             </div>
         </div>
     </form>
+
     <h2>Nos Sorties</h2>
 
     {% if user != null %}
@@ -86,20 +107,22 @@
         </thead>
         <tbody class="table-group-divider">
         {% for sortie in sorties %}
-            {% if sortie.etat.libelle != 'En création' or ( user != null and sortie.organisateur.pseudo == user.userIdentifier and sortie.etat.libelle == 'En création') %}
+            {% if sortie.etat.libelle != 'En création' or ( user is not null and sortie.organisateur.pseudo == user.pseudo and sortie.etat.libelle == 'En création') %}
                 <tr>
                     <td>{{ sortie.nom|capitalize }}</td>
                     <td>{{ sortie.dateHeureDebut|format_datetime(pattern: "dd/MM/yyyy à hh:mm") }}</td>
                     <td>{{ sortie.dateLimiteInscription|format_datetime(pattern: "dd/MM/yyyy") }}</td>
                     <td>{{ sortie.participants|length }} / {{ sortie.NbInscriptionMax }}</td>
                     <td>{{ sortie.etat.libelle }}</td>
-                    <td>{% if sortie.participants|find(p => p.id == 0) != null %}
+                    <td>
+                        {% if user is not null and sortie.participants|filter(p => p.id == user.id)|length > 0 %}
                             X
-                        {% endif %}</td>
+                        {% endif %}
+                    </td>
                     <td>{{ sortie.organisateur.pseudo }}</td>
                     <td>
                         {% if sortie.etat.libelle != 'En création' %}
-                            <a href="{{ path('show_sortie',{ id: sortie.id }) }}">
+                            <a href="{{ path('show_sortie', { id: sortie.id }) }}">
                                 <button type="button" class="btn btn-primary">Afficher</button>
                             </a>
                             {% if sortie.dateHeureDebut > date('now') and sortie.etat.libelle != 'Annulée' and user != null  and user.userIdentifier == sortie.organisateur.pseudo %}
@@ -108,22 +131,23 @@
                                 </a>
                             {% endif %}
                         {% endif %}
-                        {% if sortie.etat.libelle == 'En création' and user != null and user.userIdentifier == sortie.organisateur.pseudo %}
-                            <a href="{{ path('update_sortie', { id: sortie.id }) }}">
-                                <button type="button" class="btn btn-primary">Modifier</button>
-                            </a>
-                            <a href="{{ path('post_sortie', { id: sortie.id }) }}">
-                                <button type="button" class="btn btn-primary">Publier</button>
-                            </a>
-                            <a href="{{ path('delete_sortie',{ id: sortie.id }) }}">
-                                <button type="button" class="btn btn-danger">Supprimer</button>
-                            </a>
+
+                        {% if sortie.etat.libelle == 'En création' and user is not null and user.pseudo == sortie.organisateur.pseudo %}
+                            <button type="button" class="btn btn-primary">Modifier</button>
+                            <button type="button" class="btn btn-primary">Publier</button>
+                            <button type="button" class="btn btn-danger">Supprimer</button>
                         {% else %}
-                            {% if sortie.etat.libelle != ('Clôturée' or 'Annulée' or 'Terminée') %}
-                                {% if sortie.participants|find(p => p.id == 0) != null %}
-                                    <button type="button" class="btn btn-primary">Se désister</button>
+                            {% if user is not null %}
+                                {% if sortie.participants|filter(p => p.id == user.id)|length == 0 %}
+                                    <!-- Bouton S'inscrire s'affiche uniquement si l'utilisateur n'est pas inscrit -->
+                                    <a href="{{ path('inscription_sortie', { 'id': sortie.id, 'p_id': user.id }) }}">
+                                        <button type="button" class="btn btn-primary">S'inscrire</button>
+                                    </a>
                                 {% else %}
-                                    <button type="button" class="btn btn-primary">S'inscrire</button>
+                                    <!-- Bouton Se désister s'affiche si l'utilisateur est déjà inscrit -->
+                                    <a href="{{ path('desister_sortie', { 'id': sortie.id, 'p_id': user.id }) }}">
+                                        <button type="button" class="btn btn-primary">Se désister</button>
+                                    </a>
                                 {% endif %}
                             {% endif %}
                         {% endif %}
