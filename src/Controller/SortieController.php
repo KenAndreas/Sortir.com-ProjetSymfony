@@ -27,11 +27,34 @@ final class SortieController extends AbstractController
             $user = $this->getUser();
             $user = $em->getRepository(Participant::class)->findOneBy(['id' => $user->getId()]);
         }
+        $isModified = false;
+        $sorties = $em->getRepository(Sortie::class)->findAll();
+/*        foreach ($sorties as $sortie) {
+            $limitDate = $sortie;
+            $limitDate = date_add($limitDate->getDateHeureDebut(), date_interval_create_from_date_string("1 month"));
+            printf($limitDate->format('Y-m-d') . ' pour ' . $sortie->getDateHeureDebut()->format('Y-m-d'));
+            if($sortie->getDateHeureDebut()  >= $limitDate && $sortie->getEtat()->getLibelle() != 'Historisée'){
+                $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Historisée']));
+                $isModified = true;
+            }
+        }*/
+
+        if ($isModified) {
+            $em->flush();
+        }
+
+        $filter = function ($el)
+        {
+            if($el->getEtat()->getLibelle() != 'Historisée'){
+                return true;
+            }
+            return false;
+        };
+
 
         return $this->render('sortie/home.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
-            'sorties' => $em->getRepository(Sortie::class)->findAll(),
-            'today' => new \DateTime(),
+            'sorties' => array_filter($sorties, $filter),
             'user' => $user,
         ]);
     }
@@ -272,7 +295,7 @@ final class SortieController extends AbstractController
     }
 
     #[Route('/sortie/inscription/{id}/{p_id}', name: 'inscription_sortie')]
-    public function inscrireSortie(int $id, int $p_id, EntityManagerInterface $em): Response
+    public function inscrireSortie(int $id, string $p_id, EntityManagerInterface $em): Response
     {
         // Récupérer la sortie par son ID
         $sortie = $em->getRepository(Sortie::class)->find($id);
@@ -284,7 +307,7 @@ final class SortieController extends AbstractController
         }
 
         // Récupérer le participant par son ID
-        $participant = $em->getRepository(Participant::class)->find($p_id);
+        $participant = $em->getRepository(Participant::class)->findOneBy(["pseudo" => $p_id]);
 
         // Vérifier si le participant existe
         if (!$participant) {
@@ -326,7 +349,7 @@ final class SortieController extends AbstractController
 
     // Route pour se désister d'une sortie
     #[Route('/sortie/desister/{id}/{p_id}', name: 'desister_sortie', methods: ['GET'])]
-    public function desisterSortie(int $id, int $p_id, EntityManagerInterface $em): Response
+    public function desisterSortie(int $id, string $p_id, EntityManagerInterface $em): Response
     {
         // Récupérer la sortie par son ID
         $sortie = $em->getRepository(Sortie::class)->find($id);
@@ -343,8 +366,8 @@ final class SortieController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        // Récupérer le participant par son ID
-        $participant = $em->getRepository(Participant::class)->find($p_id);
+        // Récupérer le participant par son pseudo
+        $participant = $em->getRepository(Participant::class)->findOneBy(["pseudo" => $p_id]);
 
         // Vérifier si le participant existe
         if (!$participant) {
