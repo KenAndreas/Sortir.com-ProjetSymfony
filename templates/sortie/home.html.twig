@@ -135,7 +135,9 @@
                         {% if sortie.etat.libelle == 'En création' and user is not null and user.pseudo == sortie.organisateur.pseudo %}
                             <button type="button" class="btn btn-primary">Modifier</button>
                             <button type="button" class="btn btn-primary">Publier</button>
-                            <button type="button" class="btn btn-danger">Supprimer</button>
+                            <a href="{{ path('delete_sortie',{ id: sortie.id }) }}">
+                                <button type="button" class="btn btn-danger">Supprimer</button>
+                            </a>
                         {% else %}
                             {% if user is not null %}
                                 {% if sortie.participants|filter(p => p.id == user.id)|length == 0 %}
