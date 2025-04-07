@@ -28,10 +28,34 @@ final class SortieController extends AbstractController
             $user = $this->getUser();
             $user = $em->getRepository(Participant::class)->findOneBy(['id' => $user->getId()]);
         }
+        $isModified = false;
+        $sorties = $em->getRepository(Sortie::class)->findAll();
+/*        foreach ($sorties as $sortie) {
+            $limitDate = $sortie;
+            $limitDate = date_add($limitDate->getDateHeureDebut(), date_interval_create_from_date_string("1 month"));
+            printf($limitDate->format('Y-m-d') . ' pour ' . $sortie->getDateHeureDebut()->format('Y-m-d'));
+            if($sortie->getDateHeureDebut()  >= $limitDate && $sortie->getEtat()->getLibelle() != 'Historisée'){
+                $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Historisée']));
+                $isModified = true;
+            }
+        }*/
+
+        if ($isModified) {
+            $em->flush();
+        }
+
+        $filter = function ($el)
+        {
+            if($el->getEtat()->getLibelle() != 'Historisée'){
+                return true;
+            }
+            return false;
+        };
+
 
         return $this->render('sortie/home.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
-            'sorties' => $em->getRepository(Sortie::class)->findAll(),
+            'sorties' => array_filter($sorties, $filter),
             'user' => $user,
         ]);
     }

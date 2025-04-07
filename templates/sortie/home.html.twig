@@ -65,9 +65,12 @@
         </div>
     </form>
     <h2>Nos Sorties</h2>
+
+    {% if user != null %}
     <a href="{{ path('create_sortie') }}">
         <button type="button" class="btn btn-primary">Créer une sortie</button>
     </a>
+    {% endif %}
     <table class="table table-bordered table-hover">
         <thead>
         <tr>
@@ -99,7 +102,7 @@
                             <a href="{{ path('show_sortie',{ id: sortie.id }) }}">
                                 <button type="button" class="btn btn-primary">Afficher</button>
                             </a>
-                            {% if sortie.dateHeureDebut > date('now') and sortie.etat.libelle != 'Annulée' %}
+                            {% if sortie.dateHeureDebut > date('now') and sortie.etat.libelle != 'Annulée' and user != null  and user.userIdentifier == sortie.organisateur.pseudo %}
                                 <a href="{{ path('annuler_sortie',{ id: sortie.id }) }}">
                                     <button type="button" class="btn btn-primary">Annuler</button>
                                 </a>
@@ -130,7 +133,9 @@
         {% endfor %}
         </tbody>
     </table>
-    <a href="{{ path('create_sortie') }}">
-        <button type="button" class="btn btn-primary">Créer une sortie</button>
-    </a>
+    {% if user != null %}
+        <a href="{{ path('create_sortie') }}">
+            <button type="button" class="btn btn-primary">Créer une sortie</button>
+        </a>
+    {% endif %}
 {% endblock %}
