@@ -103,12 +103,25 @@ $hashedPassword = $this->passwordHasher->hashPassword($participant2, 'password')
 $participant2->setMotDePasse($hashedPassword);
 $manager->persist($participant2);
 
+// Création de participants avec mot de passe haché
+    $participant3 = new Participant();
+    $participant3->setNom($faker->lastName)
+        ->setPrenom($faker->firstName)
+        ->setMail($faker->email)
+        ->setAdministrateur(false)
+        ->setActif(true)
+        ->setPseudo($faker->userName)
+        ->setCampus($campus1);
+    $hashedPassword = $this->passwordHasher->hashPassword($participant3, 'password');
+    $participant3->setMotDePasse($hashedPassword);
+    $manager->persist($participant3);
+
 // Création de sorties
 $sortie1 = new Sortie();
 $sortie1->setNom('Concert de Rock')
 ->setDateHeureDebut($faker->dateTimeThisYear)
 ->setDuree(new \DateTime('02:00:00'))
-->setDateLimiteInscription($faker->dateTimeBetween('-1 week', 'now'))
+->setDateLimiteInscription($faker->dateTimeBetween('-1 week', '+3 week'))
 ->setNbInscriptionMax(100)
 ->setInfosSortie('Concert au Stade de France')
 ->setEtat($etat1)
@@ -126,7 +139,7 @@ $sortie2 = new Sortie();
 $sortie2->setNom('Sortie sportive')
 ->setDateHeureDebut($faker->dateTimeThisYear)
 ->setDuree(new \DateTime('02:00:00'))
-->setDateLimiteInscription($faker->dateTimeBetween('-1 week', 'now'))
+->setDateLimiteInscription($faker->dateTimeBetween('-1 week', '+1 week'))
 ->setNbInscriptionMax(20)
 ->setInfosSortie('Randonnée dans la montagne')
 ->setEtat($etat2)
@@ -139,6 +152,27 @@ $sortie2->addParticipant($participant1);
 $sortie2->addParticipant($participant2);  // Ajoute participant2 à la sortie2
 
 $manager->persist($sortie2);
+
+
+// Sortie sans participants supplémentaires
+    $sortie3 = new Sortie();
+    $sortie3->setNom('Exposition d\'art')
+        ->setDateHeureDebut($faker->dateTimeBetween('now', '+3 week'))
+        ->setDuree(new \DateTime('03:00:00'))
+        ->setDateLimiteInscription($faker->dateTimeBetween('now', '+6 week'))
+        ->setNbInscriptionMax(50)
+        ->setInfosSortie('Exposition d\'art contemporain au musée')
+        ->setEtat($etat2)
+        ->setCampus($campus1)
+        ->setLieu($lieu1)
+        ->setOrganisateur($participant1);
+
+// Ne pas ajouter de participants à cette sortie
+    $manager->persist($sortie3);
+
+// Finalisation de la persistance des données
+    $manager->flush();
+
 
 // Finalisation de la persistance des données
 $manager->flush();
