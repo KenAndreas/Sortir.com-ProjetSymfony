@@ -7,6 +7,8 @@ use App\Entity\Participant;
 use App\Form\ProfileType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,8 +20,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class ProfileController extends AbstractController
 {
     #[Route('/mon-profil', name: 'app_mon-profile', methods: ['GET', 'POST'])]
-    public function edit(Request $request, UserInterface $user, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager)
+    public function edit(Request $request, UserInterface $user, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager) :Response
     {
+
         // Assurez-vous que $user est bien une instance de Participant
         $participant = $user; // Ici, on suppose que l'utilisateur est une instance de Participant
 
@@ -41,6 +44,28 @@ class ProfileController extends AbstractController
                 $hashedPassword = $passwordHasher->hashPassword($participant, $motDePasse);
                 $participant->setMotDePasse($hashedPassword);  // Mettre à jour le mot de passe haché dans l'entité
             }
+            // Gestion de l'upload de la photo
+            /** @var UploadedFile $photoFile */
+            $photoFile = $form->get('photo')->getData();
+            if ($photoFile) {
+                // Générer un nom unique pour le fichier
+                $newFilename = uniqid() . '.' . $photoFile->guessExtension();
+
+                // Déplacer le fichier dans le répertoire de stockage
+                try {
+                    $photoFile->move(
+                        $this->getParameter('uploads_directory'), // Répertoire où vous voulez stocker les photos
+                        $newFilename
+                    );
+                } catch (IOExceptionInterface $e) {
+                    $this->addFlash('error', 'Erreur lors du téléchargement de la photo');
+                    return $this->redirectToRoute('app_mon-profile');
+                }
+
+                // Mettre à jour le chemin de la photo dans l'entité
+                $participant->setPhoto($newFilename);
+            }
+
 
             // Sauvegarder les modifications dans la base de données
             $entityManager->flush();
@@ -55,6 +80,7 @@ class ProfileController extends AbstractController
         // Rendu du formulaire pour afficher les champs et les erreurs si nécéssaire
         return $this->render('profile/edit.html.twig', [
             'form' => $form->createView(),
+            'user' => $participant,  // Pass the 'user' variable to the template
         ]);
     }
 

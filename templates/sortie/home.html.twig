@@ -144,8 +144,9 @@
                             </a>
                         {% else %}
                             {% if user is not null %}
-                                {% if sortie.participants|filter(p => p.pseudo == user.userIdentifier)|length == 0 %}
-                                    <!-- Bouton S'inscrire s'affiche uniquement si l'utilisateur n'est pas inscrit -->
+                                {% if sortie.participants|filter(p => p.pseudo == user.userIdentifier)|length == 0 and
+                                    (sortie.participants|length < sortie.NbInscriptionMax and sortie.dateLimiteInscription >= date('now')) %}
+                                    <!-- Afficher le bouton "S'inscrire" uniquement si l'utilisateur n'est pas inscrit, si le nombre de participants est inférieur au nombre maximal, et si la date limite d'inscription n'est pas passée -->
                                     <a href="{{ path('inscription_sortie', { 'id': sortie.id, 'p_id': user.userIdentifier }) }}">
                                         <button type="button" class="btn btn-primary">S'inscrire</button>
                                     </a>
