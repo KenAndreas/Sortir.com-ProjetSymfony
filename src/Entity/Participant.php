@@ -41,6 +41,9 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, unique: true)]
     private ?string $pseudo = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $photo = null;
+
     #[ORM\ManyToOne(inversedBy: 'participants')]
     private ?Campus $campus = null;
 
@@ -55,6 +58,18 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->sorties = new ArrayCollection();
+    }
+
+    public function getPhoto(): ?string
+    {
+        return $this->photo;
+    }
+
+    public function setPhoto(?string $photo): static
+    {
+        $this->photo = $photo;
+
+        return $this;
     }
 
     public function getId(): ?int

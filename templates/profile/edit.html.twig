@@ -6,6 +6,14 @@
     <div class="container mt-4">
         <h1 class="mb-4">Modifier votre profil</h1>
 
+        {# Afficher la photo de profil si elle existe #}
+        {% if user.photo %}
+            <img src="{{ asset('uploads/profils/' ~ user.photo) }}" alt="Photo de profil" class="img-thumbnail" width="200">
+        {% else %}
+            <p>Aucune photo de profil définie.</p>
+        {% endif %}
+
+
         {{ form_start(form) }}
 
         <div class="mb-1">
