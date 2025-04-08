@@ -3,8 +3,8 @@
 
 namespace App\Form;
 
-use App\Entity\Campus;
 use App\Entity\Participant;
+use App\Entity\Campus;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -37,6 +38,12 @@ class ProfileType extends AbstractType
             ->add('actif', CheckboxType::class,[
                 'label' => ' actif',
                 'required' => false,
+            ])
+            ->add('photo', FileType::class, [
+                'label' => 'Photo de profil',
+                'required' => false,  // Optionnel
+                'mapped' => false,    // Ne pas mapper directement à l'entité (car c'est un fichier)
+                'attr' => ['accept' => 'image/*'], // Limiter les types de fichiers aux images
             ]);
     }
 
@@ -48,3 +55,10 @@ class ProfileType extends AbstractType
     }
 }
 
+public function configureOptions(OptionsResolver $resolver)
+{
+$resolver->setDefaults([
+'data_class' => Participant::class,
+]);
+}
+}

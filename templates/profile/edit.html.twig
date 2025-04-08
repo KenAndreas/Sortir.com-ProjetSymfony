@@ -18,6 +18,14 @@
             {% endif %}
         </h1>
 
+        {# Afficher la photo de profil si elle existe #}
+        {% if user.photo %}
+            <img src="{{ asset('uploads/profils/' ~ user.photo) }}" alt="Photo de profil" class="img-thumbnail" width="200">
+        {% else %}
+            <p>Aucune photo de profil définie.</p>
+        {% endif %}
+
+
         {{ form_start(form) }}
 
         {% if is_granted('ROLE_ADMIN') %}
