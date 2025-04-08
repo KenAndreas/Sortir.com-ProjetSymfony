@@ -40,4 +40,7 @@ class SortieRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function createQuery(string $string)
+    {
+    }
 }

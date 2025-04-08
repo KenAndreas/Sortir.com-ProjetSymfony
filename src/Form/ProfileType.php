@@ -7,6 +7,7 @@ use App\Entity\Campus;
 use App\Entity\Participant;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
@@ -22,16 +23,20 @@ class ProfileType extends AbstractType
             ->add('nom', TextType::class)
             ->add('prenom', TextType::class)
             ->add('telephone', TelType::class, ['required' => false])
-            ->add('mail', EmailType::class)
-            ->add('pseudo', TextType::class)
+            ->add('mail', EmailType::class, ['required' => true])
+            ->add('pseudo', TextType::class, ['required' => true])
             ->add('campus', EntityType::class, [
+                'required' => true,
                 'class' => Campus::class,
-                'choice_label' => 'nom',
-                'disabled' => true, // Le champ campus est visible mais non modifiable
+                'choice_label' => 'nom'
             ])
             ->add('motDePasse', PasswordType::class, [
                 'required' => true,  // Mot de passe obligatoire
                 'label' => ' mot de passe',
+            ])
+            ->add('actif', CheckboxType::class,[
+                'label' => ' actif',
+                'required' => false,
             ]);
     }
 

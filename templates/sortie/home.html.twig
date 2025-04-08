@@ -19,9 +19,6 @@
             {% for message in messages %}
                 <p class="mb-0">{{ message }}</p>
             {% endfor %}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
         </div>
     {% endfor %}
 
@@ -54,6 +51,7 @@
                 </div>
             </div>
             <div class="col">
+                {% if user is not null %}
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="checkOrga" name="checkOrga">
                     <label class="form-check-label" for="checkOrga">
@@ -72,6 +70,7 @@
                         Sorties auxquelles je ne suis pas inscrit(e)
                     </label>
                 </div>
+                {% endif %}
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="checkClose" name="checkClose">
                     <label class="form-check-label" for="checkClose">
@@ -87,7 +86,7 @@
 
     <h2>Nos Sorties</h2>
 
-    {% if user != null %}
+    {% if user is not null %}
     <a href="{{ path('create_sortie') }}">
         <button type="button" class="btn btn-primary">Créer une sortie</button>
     </a>
