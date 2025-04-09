@@ -61,11 +61,11 @@
                 <div id="group-{{ l.id }}" class="lieux hide">
                     <div class="row form-group">
                         <label for="rue">Rue : </label>
-                        <input id="rue" type="text" value="{{ l.rue }}" disabled/>
+                        <input id="rue" type="text" class="form-control form-control-sm" value="{{ l.rue }}" disabled/>
                     </div>
                     <div class="row form-group">
                         <label for="cp">Code Postal : </label>
-                        <input id="cp" type="text" value="{{ l.ville.codePostal }}" disabled/>
+                        <input id="cp" type="text" class="form-control form-control-sm" value="{{ l.ville.codePostal }}" disabled/>
                     </div>
                 </div>
             {% endfor %}
