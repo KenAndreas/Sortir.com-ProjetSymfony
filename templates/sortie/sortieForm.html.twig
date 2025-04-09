@@ -3,6 +3,11 @@
 {% block title %}Hello CampusController!{% endblock %}
 
 {% block body %}
+    <style>
+        .hide{
+            display: none;
+        }
+    </style>
     <h1>Créer une sortie</h1>
 
     {{ form_start(form) }}
@@ -10,16 +15,16 @@
         {% if form_errors(form.nom)|length or form_errors(form.dateHeureDebut)|length or
             form_errors(form.dateLimiteInscription)|length or form_errors(form.duree)|length
             or form_errors(form.campus)|length or form_errors(form.lieu)|length or form_errors(form.infosSortie)|length %}
-        <div class="row large alert alert-warning">
-            {{ form_errors(form.nom) }}
-            {{ form_errors(form.dateHeureDebut) }}
-            {{ form_errors(form.dateLimiteInscription) }}
-            {{ form_errors(form.duree) }}
-            {{ form_errors(form.campus) }}
-            {{ form_errors(form.lieu) }}
-            {{ form_errors(form.infosSortie) }}
-        </div>
-    {% endif %}
+            <div class="row large alert alert-warning">
+                {{ form_errors(form.nom) }}
+                {{ form_errors(form.dateHeureDebut) }}
+                {{ form_errors(form.dateLimiteInscription) }}
+                {{ form_errors(form.duree) }}
+                {{ form_errors(form.campus) }}
+                {{ form_errors(form.lieu) }}
+                {{ form_errors(form.infosSortie) }}
+            </div>
+        {% endif %}
         <div class="col">
             <div class="row form-group">
                 {{ form_label(form.nom) }}
@@ -51,6 +56,19 @@
                 {{ form_label(form.lieu) }}
                 {{ form_widget(form.lieu) }}
             </div>
+
+            {% for l in lieux %}
+                <div id="group-{{ l.id }}" class="lieux hide">
+                    <div class="row form-group">
+                        <label for="rue">Rue : </label>
+                        <input id="rue" type="text" value="{{ l.rue }}" disabled/>
+                    </div>
+                    <div class="row form-group">
+                        <label for="cp">Code Postal : </label>
+                        <input id="cp" type="text" value="{{ l.ville.codePostal }}" disabled/>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
         <div class="row large">
             {{ form_label(form.infosSortie) }}
@@ -65,4 +83,18 @@
         </div>
     </div>
     {{ form_end(form) }}
+    <script type="text/javascript">
+        let lieu = Array.prototype.slice.call(document.getElementsByClassName("lieux"));
+        let lieuSelected = document.getElementById('sortie_lieu')
+
+        function afficherLieu(el) {
+            lieu.forEach(el =>
+                el.classList.add("hide")
+            )
+            let group = document.getElementById('group-'+el.target.value)
+            group.classList.remove("hide");
+        }
+
+        lieuSelected.addEventListener("change", afficherLieu)
+    </script>
 {% endblock %}
