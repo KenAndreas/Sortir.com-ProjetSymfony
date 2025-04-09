@@ -35,7 +35,7 @@ class ProfileType extends AbstractType
                 'required' => true,  // Mot de passe obligatoire
                 'label' => ' mot de passe',
             ])
-            ->add('actif', CheckboxType::class,[
+            ->add('actif', CheckboxType::class, [
                 'label' => ' actif',
                 'required' => false,
             ])
@@ -55,10 +55,3 @@ class ProfileType extends AbstractType
     }
 }
 
-public function configureOptions(OptionsResolver $resolver)
-{
-$resolver->setDefaults([
-'data_class' => Participant::class,
-]);
-}
-}

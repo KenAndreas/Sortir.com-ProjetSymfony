@@ -19,8 +19,8 @@
         </h1>
 
         {# Afficher la photo de profil si elle existe #}
-        {% if user.photo %}
-            <img src="{{ asset('uploads/profils/' ~ user.photo) }}" alt="Photo de profil" class="img-thumbnail" width="200">
+        {% if user is not null and participant.photo %}
+            <img src="{{ asset('uploads/profils/' ~ participant.photo) }}" alt="Photo de profil" class="img-thumbnail" style="max-height: 200px; max-width: 200px">
         {% else %}
             <p>Aucune photo de profil définie.</p>
         {% endif %}
@@ -59,6 +59,10 @@
 
         <div class="mb-1">
             {{ form_row(form.motDePasse, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <div class="mb-1">
+            {{ form_row(form.photo, {'attr': {'class': 'form-control'}}) }}
         </div>
 
         {% if is_granted('ROLE_ADMIN') %}

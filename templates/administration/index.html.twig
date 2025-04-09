@@ -5,9 +5,39 @@
 {% block body %}
 
     <div class="container">
-            <h2><a href="{{ path('admin_users') }}">Utilisateurs</a></h2>
-            <h2><a href="{{ path('admin_campus') }}">Campus</a></h2>
-            <h2><a href="{{ path('admin_lieux') }}">Lieux</a></h2>
+        <h2>Utilisateurs</h2>
+        <a href="{{ path('admin_users') }}">
+            <button type="button" class="btn btn-primary">
+                Liste des utilisateurs
+            </button>
+        </a>
+        <a href="{{ path('create_user') }}">
+            <button type="button" class="btn btn-primary">
+                Créer un utilisateur
+            </button>
+        </a>
+        <h2>Campus</h2>
+        <a href="{{ path('admin_campus') }}">
+            <button type="button" class="btn btn-primary">
+                Liste des campus
+            </button>
+        </a>
+        <a href="{{ path('create_campus') }}">
+            <button type="button" class="btn btn-primary">
+                Créer un campus
+            </button>
+        </a>
+        <h2>Villes</h2>
+        <a href="{{ path('admin_villes') }}">
+            <button type="button" class="btn btn-primary">
+                Liste des villes
+            </button>
+        </a>
+        <a href="{{ path('create_ville') }}">
+            <button type="button" class="btn btn-primary">
+                Créer une ville
+            </button>
+        </a>
         <br>
     </div>
 {% endblock %}
