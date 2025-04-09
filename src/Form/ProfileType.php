@@ -30,15 +30,15 @@ $builder
 'choice_label' => 'nom',
 'disabled' => true, // Le champ campus est visible mais non modifiable
 ])
-->add('motDePasse', PasswordType::class, [
+    ->add('photo', FileType::class, [
+        'label' => 'Photo de profil',
+        'required' => false,  // Optionnel
+        'mapped' => false,    // Ne pas mapper directement à l'entité (car c'est un fichier)
+        'attr' => ['accept' => 'image/*'], // Limiter les types de fichiers aux images
+    ])
+    ->add('motDePasse', PasswordType::class, [
 'required' => true,  // Mot de passe obligatoire
 'label' => 'Mot de passe',
-])
-->add('photo', FileType::class, [
-'label' => 'Photo de profil',
-'required' => false,  // Optionnel
-'mapped' => false,    // Ne pas mapper directement à l'entité (car c'est un fichier)
-'attr' => ['accept' => 'image/*'], // Limiter les types de fichiers aux images
 ]);
 }
 

@@ -34,6 +34,11 @@ class Sortie
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $infosSortie = null;
 
+
+
+
+
+
     #[ORM\ManyToOne(targetEntity: Etat::class, inversedBy: "sorties")]
     private ?object $etat = null;
 
@@ -42,6 +47,10 @@ class Sortie
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     private ?Lieu $lieu = null;
+
+    #[ORM\ManyToOne(targetEntity: Ville::class)]
+    #[ORM\JoinColumn(name: "ville_id", referencedColumnName: "id", nullable: false)]
+    private ?Ville $ville = null;
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
@@ -175,6 +184,18 @@ class Sortie
     public function setLieu(?lieu $lieu): static
     {
         $this->lieu = $lieu;
+
+        return $this;
+    }
+
+    public function getVille(): ?Ville
+    {
+        return $this->ville;
+    }
+
+    public function setVille(?Ville $ville): static
+    {
+        $this->ville = $ville;
 
         return $this;
     }

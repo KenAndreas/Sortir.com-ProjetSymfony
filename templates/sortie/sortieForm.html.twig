@@ -36,6 +36,10 @@
                 {{ form_widget(form.campus) }}
             </div>
             <div class="row form-group">
+                {{ form_label(form.ville) }}
+                {{ form_widget(form.ville) }}
+            </div>
+            <div class="row form-group">
                 {{ form_label(form.lieu) }}
                 {{ form_widget(form.lieu) }}
             </div>
@@ -54,3 +58,65 @@
     </div>
     {{ form_end(form) }}
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+<script type="text/javascript">
+    console.log("Test fonctionnel");
+
+</script>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById('sortie_ville').addEventListener('change', function (event) {
+                console.log("Test");
+                console.log("Ville changée :", event.target.value);
+                let villeId = event.target.value;
+
+                // Si une ville est sélectionnée, envoyer une requête AJAX pour récupérer les lieux associés
+                if (villeId) {
+                    fetch('{{ path('get_lieux_by_ville') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'villeId=' + villeId
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Vérifier que nous avons bien reçu des données
+                            console.log('Données des lieux:', data);
+
+                            // Mettre à jour le champ "lieu" avec les nouveaux lieux
+                            let lieuSelect = document.getElementById('sortie_lieu');
+                            lieuSelect.innerHTML = ''; // Vider le champ "lieu" pour ajouter les nouvelles options
+                            lieuSelect.disabled = false; // Réactiver le champ "lieu" si une ville est sélectionnée
+
+                            // Ajouter une option par défaut
+                            let defaultOption = document.createElement('option');
+                            defaultOption.value = '';
+                            defaultOption.textContent = 'Sélectionnez un lieu';
+                            lieuSelect.appendChild(defaultOption);
+
+                            // Ajouter les lieux retournés par l'API
+                            data.forEach(lieu => {
+                                let option = document.createElement('option');
+                                option.value = lieu.id;
+                                option.textContent = lieu.nom;
+                                lieuSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Erreur:', error);
+                            alert('Erreur lors du chargement des lieux');
+                        });
+                } else {
+                    // Si aucune ville n'est sélectionnée, désactiver le champ "lieu"
+                    let lieuSelect = document.getElementById('sortie_lieu');
+                    lieuSelect.disabled = true;
+                    lieuSelect.innerHTML = ''; // Vider le champ "lieu"
+                }
+            });
+        });
+    </script>
+{% endblock %}
+

@@ -13,6 +13,7 @@ use App\Repository\SortieRepository;
 use App\Service\SortieService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -399,6 +400,28 @@ final class SortieController extends AbstractController
 
         // Rediriger l'utilisateur vers la page d'accueil ou la page des sorties
         return $this->redirectToRoute('home');
+    }
+    // src/Controller/SortieController.php
+
+    #[Route('/get-lieux-by-ville', name: 'get_lieux_by_ville', methods: ['POST'])]
+    public function getLieuxByVille(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $villeId = $request->request->get('villeId'); // Récupérer l'ID de la ville sélectionnée
+
+        if (!$villeId) {
+            return new JsonResponse([], 400); // Retourner une erreur si villeId est manquant
+        }
+        $lieux = $em->getRepository(Lieu::class)->findBy(['ville' => $villeId]); // Récupérer les lieux associés à la ville
+
+        $lieuxData = [];
+        foreach ($lieux as $lieu) {
+            $lieuxData[] = [
+                'id' => $lieu->getId(),
+                'nom' => $lieu->getNom(),
+            ];
+        }
+
+        return new JsonResponse($lieuxData);
     }
 
 

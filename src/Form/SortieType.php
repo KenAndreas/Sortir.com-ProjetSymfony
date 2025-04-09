@@ -7,6 +7,7 @@ use App\Entity\Etat;
 use App\Entity\Lieu;
 use App\Entity\Participant;
 use App\Entity\Sortie;
+use App\Entity\Ville;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -34,7 +35,7 @@ class SortieType extends AbstractType
                     new Length(['max' => 255, 'maxMessage' => 'Le nom ne peut dépasser 255 caractères']),
                 ]
             ])
-            ->add('dateHeureDebut', DateTImeType::class, [
+            ->add('dateHeureDebut', DateTimeType::class, [
                 'widget' => 'single_text',
                 'attr' => ['class' => 'form-control form-control-sm'],
             ])
@@ -52,14 +53,25 @@ class SortieType extends AbstractType
                 'choice_label' => 'nom',
                 'attr' => ['class' => 'form-control form-control-sm'],
             ])
+            ->add('ville', EntityType::class, [
+                'class' => Ville::class,
+                'choice_label' => 'nom',
+                'attr' => ['class' => 'form-control form-control-sm'],
+                'placeholder' => 'Sélectionnez une ville',
+            ])
             ->add('lieu', EntityType::class, [
                 'class' => Lieu::class,
                 'choice_label' => 'nom',
                 'attr' => ['class' => 'form-control form-control-sm'],
+                'disabled' => true, // Désactive le champ "lieu" tant qu'aucune ville n'est sélectionnée
             ])
-            ->add('infosSortie',TextareaType::class, [
+            // Ajout du champ infosSortie
+            ->add('infosSortie', TextareaType::class, [
                 'attr' => ['class' => 'form-control form-control-sm'],
+                'required' => false,
+                'label' => 'Informations supplémentaires',
             ])
+
             ->add('etatSave', SubmitType::class, [
                 'label' => 'Enregistrer',
                 'attr' => ['value' => 'save',
