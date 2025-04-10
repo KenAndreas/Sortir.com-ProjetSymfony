@@ -62,8 +62,10 @@ final class SortieController extends AbstractController
         $sortiesByCampus = [];
         $index = 0;
         foreach ($sortiesFiltered as $sortie) {
-            if($user != null && $sortie->getCampus() == $user->getCampus()){
-                $sortiesByCampus[$index] = $sortie;
+            if($user != null){
+                if($sortie->getCampus() == $user->getCampus()){
+                    $sortiesByCampus[$index] = $sortie;
+                }
             }else{
                 $sortiesByCampus[$index] = $sortie;
             }
