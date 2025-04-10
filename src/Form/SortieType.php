@@ -7,6 +7,7 @@ use App\Entity\Etat;
 use App\Entity\Lieu;
 use App\Entity\Participant;
 use App\Entity\Sortie;
+use App\Repository\CampusRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -21,6 +22,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Required;
 
 class SortieType extends AbstractType
 {
@@ -53,7 +55,7 @@ class SortieType extends AbstractType
             ->add('campus', EntityType::class, [
                 'class' => Campus::class,
                 'choice_label' => 'nom',
-                'attr' => ['class' => 'form-control form-control-sm'],
+                'attr' => ['class' => 'form-control form-control-sm']
             ])
             ->add('lieu', EntityType::class, [
                 'class' => Lieu::class,
@@ -62,6 +64,10 @@ class SortieType extends AbstractType
             ])
             ->add('infosSortie',TextareaType::class, [
                 'attr' => ['class' => 'form-control form-control-sm'],
+                'required' => false,
+                'constraints' => [
+                    new Length(['max' => 255, 'maxMessage' => 'Les infos ne peuvent dépasser 255 caractères']),
+                ]
             ])
             ->add('etatSave', SubmitType::class, [
                 'label' => 'Enregistrer',

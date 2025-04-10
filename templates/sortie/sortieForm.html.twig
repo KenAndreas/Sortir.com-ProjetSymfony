@@ -48,10 +48,17 @@
             </div>
         </div>
         <div class="col">
+            {% if is_granted('ROLE_ADMIN') %}
             <div class="row form-group">
                 {{ form_label(form.campus) }}
                 {{ form_widget(form.campus) }}
             </div>
+            {% else %}
+                <div class="row form-group">
+                    {{ form_label(form.campus) }}
+                    {{ form_widget(form.campus,{'attr': {'disabled': 'true'}}) }}
+                </div>
+            {% endif %}
             <div class="row form-group">
                 {{ form_label(form.lieu) }}
                 {{ form_widget(form.lieu) }}
@@ -72,7 +79,7 @@
         </div>
         <div class="row large">
             {{ form_label(form.infosSortie) }}
-            {{ form_widget(form.infosSortie) }}
+            {{ form_widget(form.infosSortie,{'attr': {'required': 'false'}}) }}
         </div>
         <div class="row large button-group">
             {{ form_widget(form.etatSave) }}

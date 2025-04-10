@@ -68,7 +68,7 @@
     <form action="{{ path('annuler_sortie',  { id: sortie.id }) }}" method="post" class="col annulation alert alert-danger">
         <div class="row">
             <label class="col" for="motif">Motif de l'annulation</label>
-            <input class="col form-control form-control-sm" name="motif" autofocus/>
+            <input class="col form-control form-control-sm" id="motif" name="motif" autofocus/>
         </div>
         <button type="submit" class="btn btn-danger" aria-label="confirmer l'annulation">Confirmer l'annulation</button>
     </form>
