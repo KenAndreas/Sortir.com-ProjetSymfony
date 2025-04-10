@@ -141,12 +141,13 @@ final class SortieController extends AbstractController
     public function createSortie(Request $request, EntityManagerInterface $em): Response
     {
         $sortie = new Sortie();
-        $form = $this->createForm(SortieType::class, $sortie);
         $user = $this->getUser();
+        $orga = $em->getRepository(Participant::class)->findOneBy(['pseudo' => $user->getUserIdentifier()]);
+        $sortie->setCampus($orga->getCampus());
+        $form = $this->createForm(SortieType::class, $sortie);
         $form->handleRequest($request);
         //vérifier utilisateur
         if ($user != null) {
-            $orga = $em->getRepository(Participant::class)->findOneBy(['pseudo' => $user->getUserIdentifier()]);
             if ($form->isSubmitted() && $form->isValid()) {
                 //Ajout des données validées
                 $sortie->setNom($form->get('nom')->getData());
@@ -160,7 +161,11 @@ final class SortieController extends AbstractController
                 } else {
                     $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Ouverte']));
                 }
-                $sortie->setCampus($em->getRepository(Campus::class)->findOneBy(['id' => $form->get('campus')->getData()]));
+                if($form->has('campus')){
+                    $sortie->setCampus($form->get('campus')->getData());
+                }else{
+                    $sortie->setCampus($orga->getCampus());
+                }
                 $sortie->setLieu($em->getRepository(Lieu::class)->findOneBy(['id' => $form->get('lieu')->getData()]));
                 $sortie->setOrganisateur($orga);
 
@@ -169,17 +174,23 @@ final class SortieController extends AbstractController
 
                 $em->flush();
                 $this->addFlash('success', 'Votre sortie a bien été' . $form->has('etatSave') ? 'enregistrée !' : 'crée !');
-                return $this->redirectToRoute('home');
+                return $this->redirectToRoute('home',[
+                    'user' => $orga,
+                ]);
             }
+
+            return $this->render('sortie/sortieForm.html.twig', [
+                'campus' => $em->getRepository(Participant::class)->findOneBy(['pseudo' => $user->getUserIdentifier()])->getCampus(),
+                'villes' => $em->getRepository(Ville::class)->findAll(),
+                'lieux' => $em->getRepository(Lieu::class)->findAll(),
+                'sorties' => $em->getRepository(Sortie::class)->findAll(),
+                'create' => true,
+                'form' => $form,
+                'errors' => $form->getErrors(),
+                'user' => $orga,
+            ]);
         }
-        return $this->render('sortie/sortieForm.html.twig', [
-            'campus' => $em->getRepository(Participant::class)->findOneBy(['pseudo' => $user->getUserIdentifier()])->getCampus(),
-            'villes' => $em->getRepository(Ville::class)->findAll(),
-            'lieux' => $em->getRepository(Lieu::class)->findAll(),
-            'sorties' => $em->getRepository(Sortie::class)->findAll(),
-            'create' => true,
-            'form' => $form,
-            'errors' => $form->getErrors(),
+        return $this->redirectToRoute('home',[
             'user' => $this->getUser(),
         ]);
     }
@@ -217,7 +228,7 @@ final class SortieController extends AbstractController
                     return $this->redirectToRoute('home', [
                         'campus' => $em->getRepository(Campus::class)->findAll(),
                         'sorties' => $em->getRepository(Sortie::class)->findAll(),
-                        'user' => $user,
+                        'user' => $sortie->getOrganisateur(),
                     ]);
                 }
             } else {
@@ -441,6 +452,4 @@ final class SortieController extends AbstractController
         return $this->redirectToRoute('home',
             ['user' => $this->getUser()]);
     }
-
-
 }

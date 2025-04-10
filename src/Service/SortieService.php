@@ -17,11 +17,11 @@ final class SortieService{
                     $filteredSorties[$index] = $sortie;
                 }
             }elseif ($dateDebut != ""){
-                if($dateDebut <= $sortie->getDateHeureDebut()){
+                if($dateDebut >= $sortie->getDateHeureDebut()){
                     $filteredSorties[$index] = $sortie;
                 }
             } elseif ($dateFin != ""){
-                if($dateFin >= $sortie->getDateHeureDebut()){
+                if($dateFin <= $sortie->getDateHeureDebut()){
                     $filteredSorties[$index] = $sortie;
                 }
             }else{
@@ -50,7 +50,14 @@ final class SortieService{
         $filteredSorties = [];
         $index = 0;
         foreach ($sorties as $sortie) {
-            if( array_find($sortie->getParticipants(), $user)){
+            $participants = $sortie->getParticipants();
+            $hasparticipant = false;
+            foreach ($participants as $participant) {
+                if($participant->getPseudo() == $user->getPseudo()){
+                    $hasparticipant = true;
+                }
+            }
+            if($hasparticipant == true){
                 $filteredSorties[$index] = $sortie;
             }
             $index+=1;
@@ -63,7 +70,14 @@ final class SortieService{
         $filteredSorties = [];
         $index = 0;
         foreach ($sorties as $sortie) {
-            if( !array_find($sortie->getParticipants(), $user)){
+            $participants = $sortie->getParticipants();
+            $hasparticipant = false;
+            foreach ($participants as $participant) {
+                if($participant->getPseudo() == $user->getPseudo()){
+                    $hasparticipant = true;
+                }
+            }
+            if($hasparticipant == false){
                 $filteredSorties[$index] = $sortie;
             }
             $index+=1;
