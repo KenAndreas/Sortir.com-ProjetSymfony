@@ -162,7 +162,7 @@ final class SortieController extends AbstractController
                     $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Ouverte']));
                 }
                 if($form->has('campus')){
-                    $sortie->setCampus($orga->getCampus());
+                    $sortie->setCampus($form->get('campus')->getData());
                 }else{
                     $sortie->setCampus($orga->getCampus());
                 }
