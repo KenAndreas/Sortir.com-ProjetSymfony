@@ -180,10 +180,10 @@ final class SortieController extends AbstractController
                 } else {
                     $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Ouverte']));
                 }
-                if ($form->has('campus')) {
-                    $sortie->setCampus($form->get('campus')->getData());
+                if ($form->get('campus')->getData() != null) {
+                    $sortie->setCampus($em->getRepository(Campus::class)->findOneBy(['id' => $form->get('campus')->getData()]));
                 } else {
-                    $sortie->setCampus($orga->getCampus());
+                    $sortie->setCampus($em->getRepository(Campus::class)->findOneBy(['id' => $orga->getCampus()->getId()]));
                 }
                 $sortie->setLieu($em->getRepository(Lieu::class)->findOneBy(['id' => $form->get('lieu')->getData()]));
                 $sortie->setOrganisateur($orga);
