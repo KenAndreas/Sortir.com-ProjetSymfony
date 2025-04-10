@@ -13,7 +13,7 @@ final class SortieService{
         $index = 0;
         foreach ($sorties as $sortie) {
             if($dateDebut != "" && $dateFin != ""){
-                if($dateDebut <= $sortie->getDateHeureDebut() && $sortie->getDateHeureDebut() <= $sortie->getDateFin()){
+                if($dateDebut <= $sortie->getDateHeureDebut() && $sortie->getDateHeureDebut() >= $dateFin){
                     $filteredSorties[$index] = $sortie;
                 }
             }elseif ($dateDebut != ""){

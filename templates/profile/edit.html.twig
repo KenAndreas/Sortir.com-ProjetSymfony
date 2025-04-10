@@ -4,11 +4,23 @@
 
 {% block body %}
     <div class="container mt-4">
-        <h1 class="mb-4">Modifier votre profil</h1>
+        <h1 class="mb-4">
+            {% if mode == "EDIT" %}
+                Modifier
+                {% if user.userIdentifier != participant.pseudo and is_granted('ROLE_ADMIN') %}
+                    le
+                {% else %}
+                    votre
+                {% endif %}
+                profil
+            {% else %}
+                Créer un utilisateur
+            {% endif %}
+        </h1>
 
         {# Afficher la photo de profil si elle existe #}
-        {% if user.photo %}
-            <img src="{{ asset('uploads/profils/' ~ user.photo) }}" alt="Photo de profil" class="img-thumbnail" width="200">
+        {% if user is not null and participant.photo %}
+            <img src="{{ asset('uploads/profils/' ~ participant.photo) }}" alt="Photo de profil" class="img-thumbnail" style="max-height: 200px; max-width: 200px">
         {% else %}
             <p>Aucune photo de profil définie.</p>
         {% endif %}
@@ -16,10 +28,15 @@
 
         {{ form_start(form) }}
 
-        <div class="mb-1">
-            {{ form_row(form.campus, {'attr': {'class': 'form-control'}}) }}
-        </div>
-
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="mb-1">
+                {{ form_row(form.campus, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        {% else %}
+            <div class="mb-1">
+                {{ form_row(form.campus, {'attr': {'class': 'form-control', 'disabled' : true}}) }}
+            </div>
+        {% endif %}
         <div class="mb-1">
             {{ form_row(form.prenom, {'attr': {'class': 'form-control'}}) }}
         </div>
@@ -44,7 +61,23 @@
             {{ form_row(form.motDePasse, {'attr': {'class': 'form-control'}}) }}
         </div>
 
-        <button type="submit" class="btn btn-primary mt-2">Mettre à jour</button>
+        <div class="mb-1">
+            {{ form_row(form.photo, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="mb-1">
+                {{ form_row(form.actif, {'attr': {'class': 'form-check form-switch'}}) }}
+            </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary mt-2">
+            {% if  mode == "EDIT" %}
+                Mettre à jour
+            {% else %}
+                Créer
+            {% endif %}
+        </button>
 
         {{ form_end(form) }}
     </div>

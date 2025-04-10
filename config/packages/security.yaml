@@ -34,3 +34,4 @@ security:
         - { path: ^/sortie/update, roles: ROLE_USER}
         - { path: ^/sortie/delete, roles: ROLE_USER}
         - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/administration, roles: ROLE_ADMIN}

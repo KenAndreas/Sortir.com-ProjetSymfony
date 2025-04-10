@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello AdministrationController!{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <h1> liste des Utilisateurs</h1>
+
+        <a href="{{ path('create_user') }}">
+            <button type="button" class="btn btn-primary">
+                Créer un utilisateur
+            </button>
+        </a>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Pseudo</th>
+                <th>Email</th>
+                <th>Campus</th>
+                <th>Actif</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for u in users %}
+                <tr>
+                    <td>
+                        {{ u.pseudo }}
+                    </td>
+                    <td>
+                        {{ u.mail }}
+                    </td>
+                    <td>
+                        {{ u.campus.nom }}
+                    </td>
+                    <td class="text-center">
+                        {% if u.actif %}
+                            X
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ path('edit_profil',  {id: u.id}) }}">
+                            <button type="button" class="btn btn-primary">Modifier</button>
+                        </a>
+                        <a href="#">
+                            <button type="button" class="btn btn-danger">Supprimer</button>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+
+    </div>
+{% endblock %}
+
