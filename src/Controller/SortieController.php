@@ -112,7 +112,7 @@ final class SortieController extends AbstractController
         return $this->render('sortie/home.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
             'sorties' => $sorties,
-            'filterForm' => $request,
+            'filterForm' => $request->request->get('filterForm'),
             'user' => $user,
         ]);
     }

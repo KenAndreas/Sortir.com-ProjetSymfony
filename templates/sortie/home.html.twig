@@ -126,7 +126,7 @@
                             </a>
                             {% if sortie.dateHeureDebut > date('now') and sortie.etat.libelle != 'Annulée' and user != null  and user.userIdentifier == sortie.organisateur.pseudo %}
                                 <a href="{{ path('annuler_sortie',{ id: sortie.id }) }}">
-                                    <button type="button" class="btn btn-primary">Annuler</button>
+                                    <button type="button" class="btn btn-warning">Annuler</button>
                                 </a>
                             {% endif %}
                         {% endif %}
@@ -147,13 +147,13 @@
                                     (sortie.participants|length < sortie.NbInscriptionMax and sortie.dateLimiteInscription >= date('now')) %}
                                     <!-- Afficher le bouton "S'inscrire" uniquement si l'utilisateur n'est pas inscrit, si le nombre de participants est inférieur au nombre maximal, et si la date limite d'inscription n'est pas passée -->
                                     <a href="{{ path('inscription_sortie', { 'id': sortie.id, 'p_id': user.userIdentifier }) }}">
-                                        <button type="button" class="btn btn-primary">S'inscrire</button>
+                                        <button type="button" class="btn btn-success">S'inscrire</button>
                                     </a>
                                 {% else %}
                                     {% if sortie.dateLimiteInscription >= date('now')%}
                                     <!-- Bouton Se désister s'affiche si l'utilisateur est déjà inscrit -->
                                     <a href="{{ path('desister_sortie', { 'id': sortie.id, 'p_id': user.userIdentifier }) }}">
-                                        <button type="button" class="btn btn-primary">Se désister</button>
+                                        <button type="button" class="btn btn-danger">Se désister</button>
                                     </a>
                                         {% endif %}
                                 {% endif %}
