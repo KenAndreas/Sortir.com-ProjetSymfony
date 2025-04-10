@@ -1,6 +1,7 @@
 ###> symfony/framework-bundle ###
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
+/public/uploads/profils
 /var/
 /vendor/
 /node_modules/

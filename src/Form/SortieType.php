@@ -42,6 +42,9 @@ class SortieType extends AbstractType
             ->add('duree', TimeType::class, [
                 'widget' => 'single_text',
                 'attr' => ['class' => 'form-control form-control-sm'],
+                'constraints' => [
+                    new NotBlank(['message' => 'Le heure est obligatoire']),
+                ]
             ])
             ->add('dateLimiteInscription', DateType::class, [
                 'widget' => 'single_text',
