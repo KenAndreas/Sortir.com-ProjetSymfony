@@ -26,25 +26,31 @@ final class SortieController extends AbstractController
     public function index(EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
+        $isModified = false;
+        $sorties = $em->getRepository(Sortie::class)->findAll();
+
         if ($user != null) {
             $user = $this->getUser();
             $user = $em->getRepository(Participant::class)->findOneBy(['pseudo' => $user->getUserIdentifier()]);
         }
-        $isModified = false;
-        $sorties = $em->getRepository(Sortie::class)->findAll();
+
         foreach ($sorties as $sortie) {
             $limitDate = new \DateTime($sortie->getDateHeureDebut()->format('Y-m-d  H:i'));
             $limitDate = date_add($limitDate, date_interval_create_from_date_string("1 month"));
-            if (new \DateTime('now') >= $limitDate && $sortie->getEtat()->getLibelle() != 'Historisée') {
-                $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Historisée']));
-                $isModified = true;
+            if ($sortie->getDateHeureDebut() < new \DateTime('now')) {
+                if (new \DateTime('now') >= $limitDate) {
+                    $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Historisée']));
+                    $isModified = true;
+                }elseif($sortie->getEtat()->getLibelle() != 'Annulée'){
+                    $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Terminée']));
+                    $isModified = true;
+                }
             }
         }
 
         if ($isModified) {
             $em->flush();
         }
-
         $filter = function ($el) {
             if ($el->getEtat()->getLibelle() != 'Historisée') {
                 return true;
@@ -52,10 +58,21 @@ final class SortieController extends AbstractController
             return false;
         };
 
+        $sortiesFiltered = array_filter($sorties, $filter);
+        $sortiesByCampus = [];
+        $index = 0;
+        foreach ($sortiesFiltered as $sortie) {
+            if($user != null && $sortie->getCampus() == $user->getCampus()){
+                $sortiesByCampus[$index] = $sortie;
+            }else{
+                $sortiesByCampus[$index] = $sortie;
+            }
+            $index += 1;
+        }
 
         return $this->render('sortie/home.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
-            'sorties' => array_filter($sorties, $filter),
+            'sorties' => $sortiesByCampus,
             'user' => $user,
         ]);
     }
@@ -128,7 +145,7 @@ final class SortieController extends AbstractController
                 'annulation' => false
             ]);
         } else {
-            return $this->redirectToRoute('app_error',[
+            return $this->redirectToRoute('app_error', [
                 'user' => $this->getUser(),
             ]);
         }
@@ -161,9 +178,9 @@ final class SortieController extends AbstractController
                 } else {
                     $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Ouverte']));
                 }
-                if($form->has('campus')){
+                if ($form->has('campus')) {
                     $sortie->setCampus($form->get('campus')->getData());
-                }else{
+                } else {
                     $sortie->setCampus($orga->getCampus());
                 }
                 $sortie->setLieu($em->getRepository(Lieu::class)->findOneBy(['id' => $form->get('lieu')->getData()]));
@@ -174,7 +191,7 @@ final class SortieController extends AbstractController
 
                 $em->flush();
                 $this->addFlash('success', 'Votre sortie a bien été' . $form->has('etatSave') ? 'enregistrée !' : 'crée !');
-                return $this->redirectToRoute('home',[
+                return $this->redirectToRoute('home', [
                     'user' => $orga,
                 ]);
             }
@@ -190,7 +207,7 @@ final class SortieController extends AbstractController
                 'user' => $orga,
             ]);
         }
-        return $this->redirectToRoute('home',[
+        return $this->redirectToRoute('home', [
             'user' => $this->getUser(),
         ]);
     }
