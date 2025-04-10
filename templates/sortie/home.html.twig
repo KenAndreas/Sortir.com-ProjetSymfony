@@ -150,10 +150,12 @@
                                         <button type="button" class="btn btn-primary">S'inscrire</button>
                                     </a>
                                 {% else %}
+                                    {% if sortie.dateLimiteInscription >= date('now')%}
                                     <!-- Bouton Se désister s'affiche si l'utilisateur est déjà inscrit -->
                                     <a href="{{ path('desister_sortie', { 'id': sortie.id, 'p_id': user.userIdentifier }) }}">
                                         <button type="button" class="btn btn-primary">Se désister</button>
                                     </a>
+                                        {% endif %}
                                 {% endif %}
                             {% endif %}
                         {% endif %}

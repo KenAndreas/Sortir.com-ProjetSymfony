@@ -12,7 +12,6 @@ use App\Form\SortieType;
 use App\Repository\SortieRepository;
 use App\Service\SortieService;
 use Doctrine\ORM\EntityManagerInterface;
-use http\Client\Curl\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -124,11 +123,14 @@ final class SortieController extends AbstractController
         $sortie = $sortieRepository->find($id);
         if ($sortie) {
             return $this->render('sortie/showSortie.html.twig', [
+                'user' => $this->getUser(),
                 'sortie' => $sortie,
                 'annulation' => false
             ]);
         } else {
-            return $this->redirectToRoute('app_error');
+            return $this->redirectToRoute('app_error',[
+                'user' => $this->getUser(),
+            ]);
         }
     }
 
@@ -221,7 +223,7 @@ final class SortieController extends AbstractController
             } else {
                 return $this->redirectToRoute('app_error', [
                     'message' => "403",
-                    'user'  => $this->getUser()
+                    'user' => $this->getUser()
                 ]);
             }
         } else {
@@ -252,7 +254,7 @@ final class SortieController extends AbstractController
         } else {
             return $this->redirectToRoute('app_error', [
                 'message' => "403",
-                'user'  => $this->getUser()
+                'user' => $this->getUser()
             ]);
         }
 
@@ -274,7 +276,7 @@ final class SortieController extends AbstractController
         } else {
             return $this->redirectToRoute('app_error', [
                 'message' => "403",
-                'user'  => $this->getUser()
+                'user' => $this->getUser()
             ]);
         }
 
@@ -320,8 +322,8 @@ final class SortieController extends AbstractController
         // Vérifier si la sortie existe
         if (!$sortie) {
             $this->addFlash('error', 'La sortie demandée n\'existe pas.');
-            return $this->redirectToRoute('home',[
-                'user'  => $this->getUser()
+            return $this->redirectToRoute('home', [
+                'user' => $this->getUser()
             ]);
         }
 
@@ -332,30 +334,30 @@ final class SortieController extends AbstractController
         if (!$participant) {
             $this->addFlash('error', 'Le participant n\'existe pas.');
             return $this->redirectToRoute('home',
-            ['user'  => $this->getUser()]);
+                ['user' => $this->getUser()]);
         }
 
         // Vérifier si la sortie est bien ouverte
         if ($sortie->getEtat()->getLibelle() !== 'Ouverte') {
             $this->addFlash('error', 'La sortie n\'est pas ouverte aux inscriptions.');
-            return $this->redirectToRoute('home',[
-                'user'  => $this->getUser()
+            return $this->redirectToRoute('home', [
+                'user' => $this->getUser()
             ]);
         }
 
         // Vérifier la date limite d'inscription
         if ($sortie->getDateLimiteInscription() <= new \DateTime()) {
             $this->addFlash('error', 'La date limite d\'inscription est dépassée.');
-            return $this->redirectToRoute('home',[
-                'user'  => $this->getUser()
+            return $this->redirectToRoute('home', [
+                'user' => $this->getUser()
             ]);
         }
 
         // Vérifier si le participant est déjà inscrit
         if ($sortie->getParticipants()->contains($participant)) {
             $this->addFlash('warning', 'Vous êtes déjà inscrit à cette sortie.');
-            return $this->redirectToRoute('home',[
-                'user'  => $this->getUser()
+            return $this->redirectToRoute('home', [
+                'user' => $this->getUser()
             ]);
         }
 
@@ -370,8 +372,8 @@ final class SortieController extends AbstractController
         $this->addFlash('success', 'Vous êtes inscrit à la sortie avec succès !');
 
         // Rediriger l'utilisateur vers la page d'accueil
-        return $this->redirectToRoute('home',[
-            'user'  => $this->getUser()
+        return $this->redirectToRoute('home', [
+            'user' => $this->getUser()
         ]);
     }
 
@@ -385,16 +387,16 @@ final class SortieController extends AbstractController
         // Vérifier si la sortie existe
         if (!$sortie) {
             $this->addFlash('error', 'La sortie demandée n\'existe pas.');
-            return $this->redirectToRoute('home',[
-                'user'  => $this->getUser()
+            return $this->redirectToRoute('home', [
+                'user' => $this->getUser()
             ]);
         }
 
         // Vérifier que la date limite d'inscription n'est pas dépassée
         if ($sortie->getDateLimiteInscription() < new \DateTime()) {
             $this->addFlash('error', 'La date limite d\'inscription est dépassée. Vous ne pouvez plus vous désister.');
-            return $this->redirectToRoute('home',[
-                'user'  => $this->getUser()
+            return $this->redirectToRoute('home', [
+                'user' => $this->getUser()
             ]);
         }
 
@@ -404,24 +406,24 @@ final class SortieController extends AbstractController
         // Vérifier si le participant existe
         if (!$participant) {
             $this->addFlash('error', 'Le participant n\'existe pas.');
-            return $this->redirectToRoute('home',[
-                'user'  => $this->getUser()
+            return $this->redirectToRoute('home', [
+                'user' => $this->getUser()
             ]);
         }
 
         // Vérifier que le participant est bien inscrit à la sortie
         if (!$sortie->getParticipants()->contains($participant)) {
             $this->addFlash('error', 'Vous n\'êtes pas inscrit à cette sortie.');
-            return $this->redirectToRoute('home',[
-                'user'  => $this->getUser()
+            return $this->redirectToRoute('home', [
+                'user' => $this->getUser()
             ]);
         }
 
         // Vérifier que la sortie n'a pas déjà commencé
         if ($sortie->getDateHeureDebut() <= new \DateTime()) {
             $this->addFlash('error', 'Vous ne pouvez pas vous désister d\'une sortie déjà commencée.');
-            return $this->redirectToRoute('home',[
-                'user'  => $this->getUser()
+            return $this->redirectToRoute('home', [
+                'user' => $this->getUser()
             ]);
         }
 
@@ -437,7 +439,7 @@ final class SortieController extends AbstractController
 
         // Rediriger l'utilisateur vers la page d'accueil ou la page des sorties
         return $this->redirectToRoute('home',
-        ['user'  => $this->getUser()]);
+            ['user' => $this->getUser()]);
     }
 
 
