@@ -69,6 +69,10 @@
             <div class="mb-1">
                 {{ form_row(form.actif, {'attr': {'class': 'form-check form-switch'}}) }}
             </div>
+            {% else %}
+            <div class="mb-1" style="display: none">
+                {{ form_row(form.actif, {'attr': {'class': 'form-check form-switch', 'disabled' : 'true'}}) }}
+            </div>
         {% endif %}
 
         <button type="submit" class="btn btn-primary mt-2">

@@ -13,6 +13,7 @@ use App\Repository\SortieRepository;
 use App\Service\SortieService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -26,25 +27,31 @@ final class SortieController extends AbstractController
     public function index(EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
+        $isModified = false;
+        $sorties = $em->getRepository(Sortie::class)->findAll();
+
         if ($user != null) {
             $user = $this->getUser();
             $user = $em->getRepository(Participant::class)->findOneBy(['pseudo' => $user->getUserIdentifier()]);
         }
-        $isModified = false;
-        $sorties = $em->getRepository(Sortie::class)->findAll();
+
         foreach ($sorties as $sortie) {
             $limitDate = new \DateTime($sortie->getDateHeureDebut()->format('Y-m-d  H:i'));
             $limitDate = date_add($limitDate, date_interval_create_from_date_string("1 month"));
-            if (new \DateTime('now') >= $limitDate && $sortie->getEtat()->getLibelle() != 'Historisée') {
-                $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Historisée']));
-                $isModified = true;
+            if ($sortie->getDateHeureDebut() < new \DateTime('now')) {
+                if (new \DateTime('now') >= $limitDate) {
+                    $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Historisée']));
+                    $isModified = true;
+                }elseif($sortie->getEtat()->getLibelle() != 'Annulée'){
+                    $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Terminée']));
+                    $isModified = true;
+                }
             }
         }
 
         if ($isModified) {
             $em->flush();
         }
-
         $filter = function ($el) {
             if ($el->getEtat()->getLibelle() != 'Historisée') {
                 return true;
@@ -52,10 +59,23 @@ final class SortieController extends AbstractController
             return false;
         };
 
+        $sortiesFiltered = array_filter($sorties, $filter);
+        $sortiesByCampus = [];
+        $index = 0;
+        foreach ($sortiesFiltered as $sortie) {
+            if($user != null){
+                if($sortie->getCampus() == $user->getCampus()){
+                    $sortiesByCampus[$index] = $sortie;
+                }
+            }else{
+                $sortiesByCampus[$index] = $sortie;
+            }
+            $index += 1;
+        }
 
         return $this->render('sortie/home.html.twig', [
             'campus' => $em->getRepository(Campus::class)->findAll(),
-            'sorties' => array_filter($sorties, $filter),
+            'sorties' => $sortiesByCampus,
             'user' => $user,
         ]);
     }
@@ -128,7 +148,7 @@ final class SortieController extends AbstractController
                 'annulation' => false
             ]);
         } else {
-            return $this->redirectToRoute('app_error',[
+            return $this->redirectToRoute('app_error', [
                 'user' => $this->getUser(),
             ]);
         }
@@ -149,6 +169,19 @@ final class SortieController extends AbstractController
         //vérifier utilisateur
         if ($user != null) {
             if ($form->isSubmitted() && $form->isValid()) {
+                if($form->get('dateHeureDebut')->getData()->format("Y-m-d") < $form->get('dateLimiteInscription')->getData()->format("Y-m-d")){
+                    $form->get('dateLimiteInscription')->addError(new FormError("La date limite doit être antérieur à la date de début de la sortie"));
+                    return $this->render('sortie/sortieForm.html.twig', [
+                        'campus' => $em->getRepository(Participant::class)->findOneBy(['pseudo' => $user->getUserIdentifier()])->getCampus(),
+                        'villes' => $em->getRepository(Ville::class)->findAll(),
+                        'lieux' => $em->getRepository(Lieu::class)->findAll(),
+                        'sorties' => $em->getRepository(Sortie::class)->findAll(),
+                        'create' => true,
+                        'form' => $form,
+                        'errors' => $form->getErrors(),
+                        'user' => $orga,
+                    ]);
+                }
                 //Ajout des données validées
                 $sortie->setNom($form->get('nom')->getData());
                 $sortie->setDateHeureDebut($form->get('dateHeureDebut')->getData());
@@ -161,10 +194,10 @@ final class SortieController extends AbstractController
                 } else {
                     $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Ouverte']));
                 }
-                if($form->has('campus')){
-                    $sortie->setCampus($form->get('campus')->getData());
-                }else{
-                    $sortie->setCampus($orga->getCampus());
+                if ($form->get('campus')->getData() != null) {
+                    $sortie->setCampus($em->getRepository(Campus::class)->findOneBy(['id' => $form->get('campus')->getData()]));
+                } else {
+                    $sortie->setCampus($em->getRepository(Campus::class)->findOneBy(['id' => $orga->getCampus()->getId()]));
                 }
                 $sortie->setLieu($em->getRepository(Lieu::class)->findOneBy(['id' => $form->get('lieu')->getData()]));
                 $sortie->setOrganisateur($orga);
@@ -173,8 +206,8 @@ final class SortieController extends AbstractController
                 $em->persist($sortie);
 
                 $em->flush();
-                $this->addFlash('success', 'Votre sortie a bien été' . $form->has('etatSave') ? 'enregistrée !' : 'crée !');
-                return $this->redirectToRoute('home',[
+                $this->addFlash('success', $form->has('etatSave') ? 'Votre sortie a bien été enregistrée !' : 'Votre sortie a bien été crée !');
+                return $this->redirectToRoute('home', [
                     'user' => $orga,
                 ]);
             }
@@ -190,7 +223,7 @@ final class SortieController extends AbstractController
                 'user' => $orga,
             ]);
         }
-        return $this->redirectToRoute('home',[
+        return $this->redirectToRoute('home', [
             'user' => $this->getUser(),
         ]);
     }
@@ -209,6 +242,19 @@ final class SortieController extends AbstractController
                 if ($form->isSubmitted() && $form->isValid()) {
                     $sortie = $initSortie;
                     //Ajout des données validées
+                    if($form->get('dateHeureDebut')->getData()->format("Y-m-d") < $form->get('dateLimiteInscription')->getData()->format("Y-m-d")){
+                        $form->get('dateLimiteInscription')->addError(new FormError("La date limite doit être antérieur à la date de début de la sortie"));
+                        return $this->render('sortie/sortieForm.html.twig', [
+                            'campus' => $em->getRepository(Participant::class)->findOneBy(['pseudo' => $user->getUserIdentifier()])->getCampus(),
+                            'villes' => $em->getRepository(Ville::class)->findAll(),
+                            'lieux' => $em->getRepository(Lieu::class)->findAll(),
+                            'sorties' => $em->getRepository(Sortie::class)->findAll(),
+                            'create' => true,
+                            'form' => $form,
+                            'errors' => $form->getErrors(),
+                            'user' => $user,
+                        ]);
+                    }
                     $sortie->setNom($form->get('nom')->getData());
                     $sortie->setDateHeureDebut($form->get('dateHeureDebut')->getData());
                     $sortie->setDuree($form->get('duree')->getData());
@@ -220,7 +266,11 @@ final class SortieController extends AbstractController
                     } else {
                         $sortie->setEtat($em->getRepository(Etat::class)->findOneBy(['libelle' => 'Ouverte']));
                     }
-                    $sortie->setCampus($em->getRepository(Campus::class)->findOneBy(['id' => $form->get('campus')->getData()]));
+                    if ($form->get('campus')->getData() != null) {
+                        $sortie->setCampus($em->getRepository(Campus::class)->findOneBy(['id' => $form->get('campus')->getData()]));
+                    } else {
+                        $sortie->setCampus($em->getRepository(Campus::class)->findOneBy(['id' => $user->getCampus()->getId()]));
+                    }
                     $sortie->setLieu($em->getRepository(Lieu::class)->findOneBy(['id' => $form->get('lieu')->getData()]));
 
                     $em->flush();

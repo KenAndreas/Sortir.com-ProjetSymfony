@@ -121,7 +121,15 @@ class ProfileController extends AbstractController
             }) || $user->getUserIdentifier() == $participant->getUserIdentifier()) {
             if ($form->isSubmitted() && $form->isValid()) {
                 // Récupérer les données du formulaire
+                if(array_find($user->getRoles(), function (string $value) {
+                    return $value != 'ROLE_ADMIN';
+                }) && $participant->isActif() != $form->get('actif')->getData()) {
+                    $init = $participant->isActif();
+                }else{
+                    $init = $form->get('actif')->getData();
+                }
                 $participant = $form->getData();
+                $participant->setIsActif($init);
                 $motDePasse = $participant->getMotDePasse();
 
                 // Vérifier si le mot de passe est correct (vous pouvez demander à l'utilisateur de confirmer son mot de passe actuel)
