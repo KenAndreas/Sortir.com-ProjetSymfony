@@ -12,14 +12,16 @@
 
     {{ form_start(form) }}
     <div id="sortie">
-        {% if form_errors(form.nom)|length or form_errors(form.dateHeureDebut)|length or
-            form_errors(form.dateLimiteInscription)|length or form_errors(form.duree)|length
-            or form_errors(form.campus)|length or form_errors(form.lieu)|length or form_errors(form.infosSortie)|length %}
+        {% if form_errors(form.nom)|length or form_errors(form.dateHeureDebut)|length
+            or form_errors(form.nbInscriptionMax)|length or form_errors(form.dateLimiteInscription)|length
+            or form_errors(form.duree)|length or form_errors(form.campus)|length
+            or form_errors(form.lieu)|length or form_errors(form.infosSortie)|length %}
             <div class="row large alert alert-warning">
                 {{ form_errors(form.nom) }}
                 {{ form_errors(form.dateHeureDebut) }}
                 {{ form_errors(form.dateLimiteInscription) }}
                 {{ form_errors(form.duree) }}
+                {{ form_errors(form.nbInscriptionMax) }}
                 {{ form_errors(form.campus) }}
                 {{ form_errors(form.lieu) }}
                 {{ form_errors(form.infosSortie) }}
